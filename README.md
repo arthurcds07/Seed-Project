@@ -42,17 +42,18 @@ Período: Maio a Novembro de 2025
 [ ] Tipagem do código com Typescript (opcional)
 [ ] Melhorias visuais valorizando a experiência do usuário
 
-
 🗓️ OUTUBRO – Finalização do trabalho escrito 
 
 [ ] Revisar e adicionar informações sobre a aplicação dentro do trabalho escrito
-[ ] 
+[ ] Utilizar a aplicação com meu público-alvo para eles testarem
+[ ] Inserir nos resultados do trabalho a experiência dos usuários com a aplicação
 
 🗓️ NOVEMBRO – Finalização e Entrega
 [ ] Revisar e entregar artigo final
-[ ] Entregar links finais (GitHub + documentação)
-[ ] Fazer backup da aplicação e banco
-[ ] Receber avaliação final
+[ ] Entregar links finais 
+[ ] Apresentar a aplicação para os professores e mentores do curso
+[ ] Procurar oportunidades de patrocinio para dar seguimento ao projeto
+
 
 📌 Anotações
 Data do próximo check-in: 10/06/2025
@@ -62,13 +63,7 @@ Dificuldades enfrentadas:
 
 Próximas metas:
  
- Meta principal é conseguir tempo para começar de fato o desenvolvimento da aplicação. A ideia é finalizar a ideia e estruturação do Front pelo menos o essencial antes do mês de Julho para que já possa adiantar as metas de Julho para desenvolver as funções utilizando o a API externa.
+ Meta principal é conseguir tempo para começar de fato o desenvolvimento da aplicação. A ideia é finalizar a ideia e estruturação do Front pelo menos o essencial antes do mês de Julho para que já possa adiantar as metas de Julho para desenvolver as funções utilizando o a API externa. Outra meta é sempre manter a aplicação atualizada no GitHub com a documentação e o cronograma.
 
 Sobre: Este cronograma representa um modelo padrão de desenvolvimento do Projeto Profissional do curso técnico em Desenvolvimento de Sistemas. Ele está organizado por etapas mensais, indo do planejamento à entrega final, com tarefas genéricas que refletem o ciclo completo de uma aplicação.
 
-Cada aluno deve personalizar este cronograma, adaptando as tarefas à realidade do seu próprio projeto. Isso inclui:
-
-Substituir ou detalhar tarefas com base nas funcionalidades da sua aplicação;
-Adicionar tarefas específicas como integração com APIs externas, relatórios, dashboards, gamificação, etc.;
-Inserir links, anotações ou subtarefas úteis ao seu processo de desenvolvimento;
-Atualizar frequentemente o status de cada tarefa para que o professor possa acompanhar seu progresso.
