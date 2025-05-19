@@ -1,4 +1,4 @@
-# Seed---PP
+# Seed-Project
 
 Projeto Profissional - Desenvolvimento de Sistemas
 Aluno: Arthur Cardoso de Souza
