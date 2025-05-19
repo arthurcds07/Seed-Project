@@ -3,7 +3,7 @@
 Projeto Profissional - Desenvolvimento de Sistemas
 Aluno: Arthur Cardoso de Souza
 Título do Projeto: Seed
-Repositório: https://github.com/arthurcds07/Seed---PP.git
+Repositório: https://github.com/arthurcds07/Seed-Project.git
 Professor Orientador: Morgana
 Período: Maio a Novembro de 2025
 
