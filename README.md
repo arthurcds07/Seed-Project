@@ -9,10 +9,10 @@ Período: Maio a Novembro de 2025
 
 🗓️ MAIO – Criação do banco de dados e Início do Back-end
 [ ] Incluir as tecnologias escolhidas para o desenvolvimento (Node.js, React Native)
-[ ] Delimitar primeiras páginas do desenvolvimento
-[ ] Iniciar o CRUD para criação de conta e login do aplicativo
+[X] Delimitar primeiras páginas do desenvolvimento
+[X] Iniciar o CRUD para criação de conta e login do aplicativo
 [ ] Estudar a documentação das API's externas que serão utilizadas
-[ ] Documentação dentro do código
+[X] Documentação dentro do código
 
 
 🗓️ JUNHO – Iniciação da criação do Frontend
