@@ -49,13 +49,13 @@ exports.loginUser = (req, res) => {
 
     const params = Array(userEmail, userPassword, userName)
     const query = `
-        INSERT INTO Users(email, password, name) WHERE email OR name = ? and password = ?
+        SELECT * FROM Users WHERE (email = ? or name = ?) AND password = ?
     `
     if (err){
         response.status(500).json({
             succes: false,
-            message: "Erro ao cadastrar usuário",
-            data: err
+            message: "Erro com login usuário",
+            data: null
         })
     } 
     //Conditional for check if exists the user
@@ -73,4 +73,11 @@ exports.loginUser = (req, res) => {
             data: err
         })
     }   
+}
+
+exports.viewUser = (req, res) => {
+    const { userEmail, userPassword, userName, userPicture } = resquest.params
+
+    const params = Array(userEmail, userPassword, userName, userPicture) 
+    const query = `SELECT * FROM Users WHERE id = ?`
 }
