@@ -46,6 +46,7 @@ exports.loginUser = (req, res) => {
         message: "Por favor, informe seu email ou nome e sua senha.",
       });
     }
+
   
     let query;
     let params;
@@ -85,6 +86,3 @@ exports.loginUser = (req, res) => {
   };
   
 
-exports.viewUser = (req,res) =>{
-    const { userEmail, userPassword, userName, userPicture} = request.params.id
-}
