@@ -1,6 +1,6 @@
 //Calling Express dependencies 
 const express = require('express')
-const router = express.Router //Express Router dependency responsible for handling all routes
+const router = express.Router()//Express Router dependency responsible for handling all routes
 
 const { createUser, viewUser, updateUser, deleteUser } = require('/routers/UserControllers')
 
