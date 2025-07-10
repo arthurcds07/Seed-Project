@@ -1,6 +1,8 @@
 const { response, request } = require('express')
 const connection = require('../config/db')
 
+
+// ------------------------------- Create User --------------------------------
 exports.createUser = (req, res) => {
     const { userEmail, userPassword, userName } = req.body;
   
@@ -34,7 +36,7 @@ exports.createUser = (req, res) => {
     });
   };
   
-
+// -------------------------------- Login User --------------------------------
 
 exports.loginUser = (req, res) => {
     const { userEmail, userPassword, userName } = req.body;
@@ -85,4 +87,15 @@ exports.loginUser = (req, res) => {
     });
   };
   
+// ------------------------------- Edit User -------------------------------
 
+exports.editUser = (req, res) => {
+  const { userId, userEmail, userPassword, userName } = req.body;
+  const { id } = req.params;
+
+  if( !userId || !userEmail || !userPassword || !userName) {
+    return res.status(400).json({
+      success: false,
+      message: "Todos os campos devem ser preenchidos!",
+    });
+  }}

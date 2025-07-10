@@ -14,5 +14,6 @@ app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`))
 
 
 exports.createUser;
-const authRoutes = require('./src/routers/authRoutes');
-app.use('/api/auth', authRoutes)
+
+app.use('/api/usuario', usuario)
+//http://localhost:3003/api/usuario/CreateUser

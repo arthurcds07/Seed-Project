@@ -8,25 +8,25 @@ Professor Orientador: Morgana
 Período: Maio a Novembro de 2025
 
 🗓️ MAIO – Criação do banco de dados e Início do Back-end
-[ ] Incluir as tecnologias escolhidas para o desenvolvimento (Node.js, React Native)
+[X] Incluir as tecnologias escolhidas para o desenvolvimento (Node.js, React Native)
 [X] Delimitar primeiras páginas do desenvolvimento
 [X] Iniciar o CRUD para criação de conta e login do aplicativo
-[ ] Estudar a documentação das API's externas que serão utilizadas
+[X] Estudar a documentação das API's externas que serão utilizadas
 [X] Documentação dentro do código
 
 
 🗓️ JUNHO – Iniciação da criação do Frontend
 
 [ ] Revisar e finalizar páginas do Figma 
-[ ] Desenvolver e fazer testes das telas com o React Native
-[ ] Fazer a conexão do Frontend com Backend 
+[X] Desenvolver e fazer testes das telas com o React Native
+
 
 🗓️ JULHO – Desenvolver página da dieta
 
 [ ] Criar conexão da API USDA FoodData Central
 [ ] Fazer as funções e CRUD 
 [ ] Fazer testes da funcionalidade e do armazenamento de cada bloco de refeição
-[ ] Criar off canvas de navegação rápida 
+
 
 🗓️ AGOSTO – Desenvolver página da rede social e receita
 
@@ -39,8 +39,10 @@ Período: Maio a Novembro de 2025
 🗓️ SETEMBRO – Documentação e Revisão
 
 [ ] Documentar rotas com Swagger 
-[ ] Tipagem do código com Typescript (opcional)
+[ ] Verificar o funcionamento da API FoodData Central a partir do front
 [ ] Melhorias visuais valorizando a experiência do usuário
+[ ] Fazer a conexão do Frontend com Backend
+[ ]Criar off canvas de navegação rápida 
 
 🗓️ OUTUBRO – Finalização do trabalho escrito 
 
