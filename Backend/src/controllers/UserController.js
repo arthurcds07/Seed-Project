@@ -98,4 +98,7 @@ exports.editUser = (req, res) => {
       success: false,
       message: "Todos os campos devem ser preenchidos!",
     });
-  }}
+  }
+
+  query = ``
+}
