@@ -1,11 +1,12 @@
 const express = require('express');
+const app = express();
 const cors = require('cors');
-PORT = 3003;
+const PORT = 3003;
+
+
 const connection = require('./config/db')
 //Create routers empty 
-const usuario = require('/routers/UsuarioRouters')
-const app = express();
-
+const user = require('./routers/UserRouter')
 
 app.use(express.json())
 app.use(cors())
@@ -13,7 +14,5 @@ app.use(cors())
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`))
 
 
-exports.createUser;
 
-app.use('/api/usuario', usuario)
-//http://localhost:3003/api/usuario/CreateUser
+app.use('/api/user', user)

@@ -2,13 +2,13 @@
 const express = require('express')
 const router = express.Router()//Express Router dependency responsible for handling all routes
 
-const { createUser, viewUser, updateUser, deleteUser } = require('/routers/UserControllers')
+const { createUser, loginUser, viewUser, updateUser, deleteUser } = require('../controllers/UserController')
 
-router.post('/User/CreateUser', createUser)
-router.post('/User/LoginUser', loginUser)
-router.get('/User/ViewUser', viewUser)
-router.put('/User/UpdateUser', updateUser)
-router.delete('/User/DeleteUser', deleteUser)
+router.post('/create', createUser)
+router.post('/login', loginUser)
+// router.get('/view', viewUser)
+// router.put('/update', updateUser)
+// router.delete('/delete', deleteUser)
 
 //Exporting variable "router" with module.exports using require()
 module.exports = router

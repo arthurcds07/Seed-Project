@@ -1,8 +1,5 @@
-const { response, request } = require('express')
-const connection = require('../config/db')
-
-
 // ------------------------------- Create User --------------------------------
+
 exports.createUser = (req, res) => {
     const { userEmail, userPassword, userName } = req.body;
   
@@ -15,7 +12,7 @@ exports.createUser = (req, res) => {
     }
   
     const query = `
-      INSERT INTO Users (email, password, name) VALUES (?, ?, ?)
+      INSERT INTO Users (email, password, user_name) VALUES (?, ?, ?)
     `;
     const params = [userEmail, userPassword, userName];
   
@@ -100,5 +97,4 @@ exports.editUser = (req, res) => {
     });
   }
 
-  query = ``
 }
