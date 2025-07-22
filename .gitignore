@@ -1,0 +1,9 @@
+# Ignora node_modules de qualquer lugar
+**/node_modules/
+
+# Ignora arquivos de log
+*.log
+
+# Ignora arquivos do sistema
+.DS_Store
+Thumbs.db

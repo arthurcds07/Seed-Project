@@ -13,3 +13,4 @@ router.post('/login', loginUser)
 //Exporting variable "router" with module.exports using require()
 module.exports = router
 
+//http://localhost:3003/api/user/create

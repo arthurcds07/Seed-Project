@@ -1,7 +1,11 @@
 // ------------------------------- Create User --------------------------------
+const connection = require('../config/db')
 
 exports.createUser = (req, res) => {
-    const { userEmail, userPassword, userName } = req.body;
+
+    const userEmail = req.body.email
+    const userPassword = req.body.password
+    const userName = req.body.username
   
     // Validação dos campos
     if (!userEmail || !userPassword || !userName) {
@@ -12,7 +16,7 @@ exports.createUser = (req, res) => {
     }
   
     const query = `
-      INSERT INTO Users (email, password, user_name) VALUES (?, ?, ?)
+      INSERT INTO User (email, password, username) VALUES (?, ?, ?)
     `;
     const params = [userEmail, userPassword, userName];
   
@@ -36,7 +40,11 @@ exports.createUser = (req, res) => {
 // -------------------------------- Login User --------------------------------
 
 exports.loginUser = (req, res) => {
-    const { userEmail, userPassword, userName } = req.body;
+    
+    const userEmail = req.body.email
+    const userPassword = req.body.password
+    const userName = req.body.username
+  
   
     // Verifica se o usuário preencheu email ou nome, e senha
     if ((!userEmail && !userName) || !userPassword) {
