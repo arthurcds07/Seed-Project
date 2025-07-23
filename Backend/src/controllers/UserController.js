@@ -94,15 +94,23 @@ exports.loginUser = (req, res) => {
   
 // ------------------------------- Edit User -------------------------------
 
-exports.editUser = (req, res) => {
-  const { userId, userEmail, userPassword, userName } = req.body;
-  const { id } = req.params;
+// exports.editUser = (req, res) => {
+//   const { userId, userEmail, userPassword, userName } = req.body;
+//   const { id } = req.params;
 
-  if( !userId || !userEmail || !userPassword || !userName) {
-    return res.status(400).json({
-      success: false,
-      message: "Todos os campos devem ser preenchidos!",
-    });
-  }
+//   if( !userId || !userEmail || !userPassword || !userName) {
+//     return res.status(400).json({
+//       success: false,
+//       message: "Todos os campos devem ser preenchidos!",
+//     });
+//   }
 
-}
+// }
+
+
+// exports.viewUser = (req, res) => {
+//   const userId = req.params.id
+
+//   if()  
+
+// }

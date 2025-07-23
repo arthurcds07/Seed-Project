@@ -2,7 +2,7 @@
 const express = require('express')
 const router = express.Router()//Express Router dependency responsible for handling all routes
 
-const { createMeal, viewMeal, updateMeal, deleteMeal } = require('/routers/MealController')
+const { createMeal, viewMeal, updateMeal, deleteMeal } = require('/controllers/MealController')
 
 router.post('/Meal/CreateMeal', createMeal)
 router.get('/Meal/ViewUser', viewMeal)
