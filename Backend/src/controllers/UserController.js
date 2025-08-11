@@ -108,9 +108,39 @@ exports.loginUser = (req, res) => {
 // }
 
 
-// exports.viewUser = (req, res) => {
-//   const userId = req.params.id
+exports.viewUser = (req, res) => {
+   
+  const userId = Number(req.params.id); //garaintir que seja um número válido
 
-//   if()  
+//verifica numero e se é positivo
+  if (!Number.isInteger(userId) || userId <= 0) {
+    return res.status(400).json({
+      message: "Insira um valor de ID válido!",
+      success: false
+    });
+  }
 
-// }
+  const query = `SELECT * FROM Users WHERE id = ?`;
+
+  connection.query(query, [userId], (err, result) => {
+    if (err) {
+      return res.status(500).json({
+        message: "Erro ao buscar usuário no servidor",
+        success: false
+      });
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuário não encontrado"
+      });
+    }
+
+    return res.status(200).json({
+      message: "Sucesso ao buscar usuário",
+      success: true,
+      data: result[0] // retorna apenas o usuário encontrado
+    });
+  });
+};

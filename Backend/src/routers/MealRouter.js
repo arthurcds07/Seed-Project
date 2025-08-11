@@ -4,10 +4,10 @@ const router = express.Router()//Express Router dependency responsible for handl
 
 const { createMeal, viewMeal, updateMeal, deleteMeal } = require('/controllers/MealController')
 
-router.post('/Meal/CreateMeal', createMeal)
-router.get('/Meal/ViewUser', viewMeal)
-router.put('/Meal/UpdateUser', updateMeal)
-router.delete('/Meal/DeleteUser', deleteMeal)
+// router.post('/Meal/CreateMeal', createMeal)
+// router.get('/Meal/ViewUser', viewMeal)
+// router.put('/Meal/UpdateUser', updateMeal)
+// router.delete('/Meal/DeleteUser', deleteMeal)
 
 //Exporting variable "router" with module.exports using require()
 module.exports = router
