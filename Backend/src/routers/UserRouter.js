@@ -7,8 +7,8 @@ const { createUser, loginUser, viewUser, updateUser, deleteUser } = require('../
 router.post('/create', createUser)
 router.post('/login', loginUser)
 router.get('/:id', viewUser)
-// router.put('/update', updateUser)
-// router.delete('/delete', deleteUser)
+router.put('/update/:id', updateUser)
+router.delete('/delete/:id', deleteUser)
 
 //Exporting variable "router" with module.exports using require()
 module.exports = router
