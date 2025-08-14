@@ -41,33 +41,24 @@ exports.createUser = (req, res) => {
 
 exports.loginUser = (req, res) => {
 
-  const userEmail = req.body.email
-  const userPassword = req.body.password
-  const userName = req.body.username
+  const identifier = req.body.identifier; // pode ser email ou username
+  const userPassword = req.body.password;
 
-
-  // Verifica se o usuário preencheu email ou nome, e senha
-  if ((!userEmail && !userName) || !userPassword) {
+  // Verifica se o usuário preencheu identifier e senha
+  if (!identifier || !userPassword) {
     return res.status(400).json({
       success: false,
-      message: "Por favor, informe seu email ou nome e sua senha.",
+      message: "Por favor, informe seu e-mail ou nome de usuário e sua senha.",
     });
   }
 
+  // Monta a query para buscar por email OU username
+  const query = `
+    SELECT * FROM User 
+    WHERE (email = ? OR username = ?) AND password = ?
+  `;
+  const params = [identifier, identifier, userPassword];
 
-  let query;
-  let params;
-
-  // Monta a query de acordo com o dado fornecido
-  if (userEmail) {
-    query = `SELECT * FROM User WHERE email = ? AND password = ?`;
-    params = [userEmail, userPassword];
-  } else {
-    query = `SELECT * FROM User WHERE username = ? AND password = ?`;
-    params = [userName, userPassword];
-  }
-
-  // Executa a query no banco
   connection.query(query, params, (err, result) => {
     if (err) {
       return res.status(500).json({
@@ -127,7 +118,7 @@ exports.updateUser = (req, res) => {
     fields.push("username = ?")
     values.push(userName)
   };
-  
+
   if (profilePicture) {
     fields.push("profile_picture = ?")
     values.push(profilePicture)
@@ -227,6 +218,13 @@ exports.deleteUser = (req, res) => {
       data: result[0] // retorna apenas o usuário encontrado
     });
   });
+    return res.status(200).json({
+    message: "Sucesso ao deletar usuário",
+    success: true,
+    data: result[0] // retorna apenas o usuário encontrado
+  });
 };
+
+
 
 

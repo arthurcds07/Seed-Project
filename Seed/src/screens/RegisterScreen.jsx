@@ -1,23 +1,25 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { View, Text, TextInput, Button, Alert, TouchableOpacity, StyleSheet, Image } from "react-native";
+import WellcomeScreen from "./WellcomeScreen";
 
-const LoginScreen = ({ navigation }) => {
-    const [identifier, setIdentifier] = useState('');
+const RegisterScreen = ({ navigation }) => {
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
 
-    const handleLogin = async () => {
+    const handleRegister = async () => {
         try {
-            await axios.post('http://localhost:3003/api/user/login', {
-                identifier,
-                password
+            await axios.post('http://localhost:3003/api/user/create', {
+                email,
+                password,
+                username
             });
-            Alert.alert('Login realizado com sucesso!', 'Bem-vindo!');
-            // Navegue para a tela principal após login, se desejar
-            // navigation.navigate('Home');
+            Alert.alert('Cadastro realizado com sucesso!', 'Você já pode fazer login.');
+            navigation.navigate('Login');
         } catch (e) {
-            console.error('Erro ao logar:', e.response?.data || e.message);
-            Alert.alert('Erro no login', e.response?.data?.message || 'Ocorreu um erro ao fazer login.');
+            console.error('Erro ao cadastrar:', e.response?.data || e.message);
+            Alert.alert('Erro no cadastro', e.response?.data?.message || 'Ocorreu um erro ao cadastrar o usuário.');
         }
     };
 
@@ -34,12 +36,12 @@ const LoginScreen = ({ navigation }) => {
                     />
                 </TouchableOpacity>
 
-                <Text style={styles.title}>Faça seu login agora!</Text>
+                <Text style={styles.title}>Crie sua conta!</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder='E-mail ou Nome de Usuário'
-                    value={identifier}
-                    onChangeText={setIdentifier}
+                    placeholder='E-mail'
+                    value={email}
+                    onChangeText={setEmail}
                     autoCapitalize='none'
                 />
                 <TextInput
@@ -49,11 +51,18 @@ const LoginScreen = ({ navigation }) => {
                     onChangeText={setPassword}
                     secureTextEntry
                 />
-                <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                    <Text style={styles.buttonText}>Entrar</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder='Nome de Usuário'
+                    value={username}
+                    onChangeText={setUsername}
+                    autoCapitalize='none'
+                />
+                <TouchableOpacity style={styles.button} onPress={handleRegister}>
+                    <Text style={styles.buttonText}>Cadastrar</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('Register')}>
-                    <Text style={styles.secondaryButtonText}>Ainda não possui uma conta? Cadastre-se agora!</Text>
+                <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('Login')}>
+                    <Text style={styles.secondaryButtonText}>Já tem uma conta? Faça login</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -137,4 +146,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default LoginScreen;
+export default RegisterScreen;
