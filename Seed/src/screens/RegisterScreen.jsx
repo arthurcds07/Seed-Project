@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { View, Text, TextInput, Button, Alert, TouchableOpacity, StyleSheet, Image } from "react-native";
-import WellcomeScreen from "./WellcomeScreen";
+import { API_ENDPOINTS } from "../config/api";
 
 const RegisterScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
@@ -10,7 +10,7 @@ const RegisterScreen = ({ navigation }) => {
 
     const handleRegister = async () => {
         try {
-            await axios.post('http://localhost:3003/api/user/create', {
+            await axios.post(API_ENDPOINTS.REGISTER, {
                 email,
                 password,
                 username

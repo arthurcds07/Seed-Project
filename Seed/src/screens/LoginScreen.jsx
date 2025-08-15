@@ -1,59 +1,68 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
-import { View, Text, TextInput, Button, Alert, TouchableOpacity, StyleSheet, Image } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Image } from "react-native";
+import { AuthContext } from "../context/AuthContext";
+import { API_ENDPOINTS } from "../config/api";
 
 const LoginScreen = ({ navigation }) => {
-    const [identifier, setIdentifier] = useState('');
-    const [password, setPassword] = useState('');
+    const [identifier, setIdentifier] = useState("");
+    const [password, setPassword] = useState("");
+    const { signIn } = useContext(AuthContext);
 
     const handleLogin = async () => {
         try {
-            await axios.post('http://localhost:3003/api/user/login', {
+            const { data } = await axios.post(API_ENDPOINTS.LOGIN, {
                 identifier,
                 password
             });
-            Alert.alert('Login realizado com sucesso!', 'Bem-vindo!');
-            // Navegue para a tela principal após login, se desejar
-            // navigation.navigate('Home');
+
+            if (data.success) {
+                await signIn(data.token ?? '', data.data); // token pode não existir, então use string vazia
+                Alert.alert(
+                    "Login realizado com sucesso!",
+                    "Bem-vindo!",
+                    [
+                        {
+                            text: "OK",
+                        }
+                    ]
+                );
+            }
+
         } catch (e) {
-            console.error('Erro ao logar:', e.response?.data || e.message);
-            Alert.alert('Erro no login', e.response?.data?.message || 'Ocorreu um erro ao fazer login.');
+            Alert.alert(
+                "Erro no login",
+                e.response?.data?.message || "Dados incorretos ou erro ao fazer login."
+            );
         }
     };
 
     return (
         <View style={styles.container}>
             <View style={styles.formCard}>
-
-                <TouchableOpacity onPress={() => navigation.navigate('Wellcome')}>
+                <TouchableOpacity onPress={() => navigation.navigate("Wellcome")}>
                     <Image
-                        source={require('../../assets/seed-logo.png')}
+                        source={require("../../assets/seed-logo.png")}
                         style={styles.logo}
-                        resizeMode="contain"
-                        accessibilityLabel="Seed Logo"
                     />
                 </TouchableOpacity>
-
-                <Text style={styles.title}>Faça seu login agora!</Text>
+                <Text style={styles.title}>Bem-vindo de volta!</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder='E-mail ou Nome de Usuário'
+                    placeholder="E-mail ou Nome de Usuário"
                     value={identifier}
                     onChangeText={setIdentifier}
-                    autoCapitalize='none'
+                    autoCapitalize="none"
                 />
                 <TextInput
                     style={styles.input}
-                    placeholder='Senha'
+                    placeholder="Senha"
                     value={password}
                     onChangeText={setPassword}
                     secureTextEntry
                 />
                 <TouchableOpacity style={styles.button} onPress={handleLogin}>
                     <Text style={styles.buttonText}>Entrar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.secondaryButton} onPress={() => navigation.navigate('Register')}>
-                    <Text style={styles.secondaryButtonText}>Ainda não possui uma conta? Cadastre-se agora!</Text>
                 </TouchableOpacity>
             </View>
         </View>
