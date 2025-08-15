@@ -3,4 +3,5 @@
 export const API_ENDPOINTS = {
   LOGIN: 'http://192.168.1.10:3003/api/user/login', 
   REGISTER: 'http://192.168.1.10:3003/api/user/create', 
+  WEB: 'http://localhost'
 };

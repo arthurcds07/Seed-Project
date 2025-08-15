@@ -7,14 +7,14 @@ const connection = require('./config/db');
 
 // routers
 const user = require('./routers/UserRouter');
-const authRoutes = require('./routers/AuthRouter');
+const authRouter = require('./routers/AuthRouter');
 
 app.use(express.json());
 app.use(cors());
 
 
 // rotas
-app.use('/auth', authRoutes);
+app.use('/api/auth', authRouter);
 app.use('/api/user', user);
 
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
