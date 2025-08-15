@@ -5,38 +5,32 @@ import { AuthContext } from "../context/AuthContext";
 import { API_ENDPOINTS } from "../config/api";
 
 const LoginScreen = ({ navigation }) => {
-    const [identifier, setIdentifier] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const { signIn } = useContext(AuthContext);
 
     const handleLogin = async () => {
         try {
+            console.log("Tentando fazer login com:", { email, password });
             const { data } = await axios.post(API_ENDPOINTS.LOGIN, {
-                identifier,
+                email,
                 password
             });
 
-            if (data.success) {
-                await signIn(data.token ?? '', data.data); // token pode não existir, então use string vazia
-                Alert.alert(
-                    "Login realizado com sucesso!",
-                    "Bem-vindo!",
-                    [
-                        {
-                            text: "OK",
-                        }
-                    ]
-                );
-            }
+            console.log("Resposta da API:", data);
 
+            if (data.success && data.token) {
+                await signIn(data.token, data.data);
+                console.log("Login bem-sucedido, token:", data.token);
+                // O RootNavigator deve redirecionar automaticamente
+            } else {
+                Alert.alert("Erro no login", data.message);
+            }
         } catch (e) {
-            Alert.alert(
-                "Erro no login",
-                e.response?.data?.message || "Dados incorretos ou erro ao fazer login."
-            );
+            console.error("Erro completo:", e);
+            Alert.alert("Erro no login", e.response?.data?.message || "Erro ao conectar");
         }
     };
-
     return (
         <View style={styles.container}>
             <View style={styles.formCard}>
@@ -49,9 +43,9 @@ const LoginScreen = ({ navigation }) => {
                 <Text style={styles.title}>Bem-vindo de volta!</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="E-mail ou Nome de Usuário"
-                    value={identifier}
-                    onChangeText={setIdentifier}
+                    placeholder="E-mail"
+                    value={email}
+                    onChangeText={setEmail}
                     autoCapitalize="none"
                 />
                 <TextInput

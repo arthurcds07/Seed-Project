@@ -1,36 +1,61 @@
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import db from '../config/db.js'; // conexão com MySQL
+// src/controllers/AuthController.js
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt'); // use se suas senhas estiverem hashadas
+const connection = require('../config/db'); // sua conexão mysql2 (callback)
 
-export const login = async (req, res) => {
-  const { identifier, password } = req.body;
-
+exports.login = async (req, res) => {
   try {
-    // Verifica se o usuário existe
-    const [user] = await db.query('SELECT * FROM users WHERE (email = ? OR username = ?)', [identifier]);
-    if (!user.length) {
-      return res.status(404).json({ message: 'Usuário não encontrado' });
+    const { email, password } = req.body;
+
+    // 1) valida
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'E-mail e senha são obrigatórios',
+      });
     }
 
-    const foundUser = user[0];
+    // 2) busca usuário
+    const sql = 'SELECT * FROM User WHERE email = ?'; // ATENÇÃO: nome da tabela! "User" vs "users"
+    connection.query(sql, [email], async (err, rows) => {
+      if (err) {
+        console.error('Erro no SELECT:', err);
+        return res.status(500).json({ success: false, message: 'Erro no servidor' });
+      }
 
-    // Compara a senha
-    const isPasswordValid = await bcrypt.compare(password, foundUser.password);
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Senha inválida' });
-    }
+      const user = rows && rows[0];
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'Usuário não encontrado' });
+      }
 
-    // Gera o token
-    const token = jwt.sign(
-      { id: foundUser.id, identifier: foundUser.identifier },
-      process.env.JWT_SECRET,
-      { expiresIn: '1h' }
-    );
+      // 3) compara senha
+      // Se você SALVOU hash com bcrypt no cadastro:
+      // const ok = await bcrypt.compare(password, user.password);
 
-    res.json({ token, user: { id: foundUser.id, identifier: foundUser.identifier } });
+      // Se está usando senha em TEXTO PURO (não recomendado):
+      const ok = password === user.password;
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Erro no login' });
+      if (!ok) {
+        return res.status(401).json({ success: false, message: 'Senha inválida' });
+      }
+
+      // 4) gera JWT
+      const token = jwt.sign(
+        { id: user.id, email: user.email, username: user.username },
+        process.env.JWT_SECRET || 'dev-secret',
+        { expiresIn: '1h' }
+      );
+
+      // 5) responde
+      return res.status(200).json({
+        success: true,
+        message: 'Login realizado com sucesso',
+        token,
+        data: { id: user.id, email: user.email, username: user.username },
+      });
+    });
+  } catch (e) {
+    console.error('Erro no login:', e);
+    return res.status(500).json({ success: false, message: 'Erro no servidor' });
   }
 };

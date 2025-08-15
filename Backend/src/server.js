@@ -1,20 +1,18 @@
 const express = require('express');
-const app = express();
 const cors = require('cors');
+require('dotenv').config(); // se quiser usar JWT_SECRET do .env
+
+const app = express();
 const PORT = 3003;
 
 const connection = require('./config/db');
-
-// routers
-const user = require('./routers/UserRouter');
-const authRouter = require('./routers/AuthRouter');
+const userRoutes = require('./routers/UserRouter');
+const authRoutes = require('./routers/AuthRouter');
 
 app.use(express.json());
 app.use(cors());
 
-
-// rotas
-app.use('/api/auth', authRouter);
-app.use('/api/user', user);
+app.use('/auth', authRoutes);
+app.use('/api/user', userRoutes);
 
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));

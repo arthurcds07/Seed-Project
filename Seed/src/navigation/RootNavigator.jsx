@@ -8,6 +8,9 @@ import AuthStack from './AuthStack';
 export default function RootNavigator() {
   const { userToken, loading } = useContext(AuthContext);
 
+  console.log("RootNavigator - userToken: ", userToken);
+  console.log("RootNavigator - loading: ", loading);
+
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

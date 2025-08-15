@@ -3,12 +3,12 @@ import { View, TouchableOpacity, Image, Text, StyleSheet} from "react-native";
 
 const HomeScreen = ({ navigation }) => {
     return(
-        <View style={container.styles}>
-            <View style={header.styles}>
-            <TouchableOpacity onPress={navigation.openDrawer()}>
-                <Image source={'../../assets/Menu.png'}></Image>
-                <Image source={'../../assets/seed-logo.png'}></Image>
+        <View style={styles.container}>
+            <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                <Image source={require("../../assets/Menu.png")} style={{ width: 32, height: 32 }} />
             </TouchableOpacity>
+            <Image source={require("../../assets/seed-logo.png")} style={{ width: 40, height: 40 }} />
             </View>
         </View>
     )
@@ -19,7 +19,16 @@ const HomeScreen = ({ navigation }) => {
             flex: 1,
             backgroundColor: '#ffffffff',
             padding: 10     
+        },
+        header: {
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: 10,
+            backgroundColor: '#DFFFD6',
+            borderRadius: 10,
         }
         
-    })
+    });
+
 export default HomeScreen;

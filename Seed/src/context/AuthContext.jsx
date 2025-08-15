@@ -10,9 +10,12 @@ export const AuthProvider = ({ children }) => {
 
   const signIn = async (token, userData) => {
     try {
+      console.log("Armazenando token:", token);
       await AsyncStorage.setItem('userToken', token);
+      console.log("Token armazenado");
       setUserToken(token);
       setUser(userData);
+      console.log("Estado atualizado");
     } catch (e) {
       console.error('Error during sign in:', e);
     }
@@ -34,6 +37,8 @@ export const AuthProvider = ({ children }) => {
         const token = await AsyncStorage.getItem('userToken');
         if (token) {
           setUserToken(token);
+        } else {
+          setUserToken(null);
         }
       } catch (e) {
         console.error('Failed to load token', e);
@@ -41,7 +46,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       }
     };
-    
+
     loadToken();
   }, []);
 

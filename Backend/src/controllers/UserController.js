@@ -1,91 +1,110 @@
 // ------------------------------- Create User --------------------------------
-const connection = require('../config/db')
+// src/controllers/UserController.js
+const bcrypt = require('bcrypt');
+const connection = require('../config/db');
 
-exports.createUser = (req, res) => {
+const createUser = async (req, res) => {
+  try {
+    const { email, password, username } = req.body;
 
-  const userEmail = req.body.email
-  const userPassword = req.body.password
-  const userName = req.body.username
-
-  // Validação dos campos
-  if (!userEmail || !userPassword || !userName) {
-    return res.status(400).json({
-      success: false,
-      message: "Todos os campos devem ser preenchidos!",
-    });
-  }
-
-  const query = `
-      INSERT INTO User (email, password, username) VALUES (?, ?, ?)
-    `;
-  const params = [userEmail, userPassword, userName];
-
-  connection.query(query, params, (err, result) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        message: "Erro ao cadastrar usuário",
-        error: err,
-      });
+    if (!email || !password || !username) {
+      return res.status(400).json({ message: 'Preencha todos os campos' });
     }
 
-    return res.status(201).json({
-      success: true,
-      message: "Usuário cadastrado com sucesso",
-      data: result,
+    // Verifica se já existe
+    const checkSql = 'SELECT * FROM User WHERE email = ? OR username = ?';
+    connection.query(checkSql, [email, username], async (err, rows) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Erro no servidor' });
+      }
+
+      if (rows.length > 0) {
+        return res.status(409).json({ message: 'E-mail ou nome de usuário já cadastrado' });
+      }
+
+      // Gera hash da senha
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Insere no banco
+      const insertSql = 'INSERT INTO User (email, password, username) VALUES (?, ?, ?)';
+      connection.query(insertSql, [email, hashedPassword, username], (err, result) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ message: 'Erro ao cadastrar usuário' });
+        }
+
+        return res.status(201).json({ message: 'Usuário cadastrado com sucesso' });
+      });
     });
-  });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ message: 'Erro no servidor' });
+  }
 };
 
 // -------------------------------- Login User --------------------------------
 
-exports.loginUser = (req, res) => {
+const loginUser = async (req, res) => {
+  const { email, password } = req.body;
 
-  const identifier = req.body.identifier; // pode ser email ou username
-  const userPassword = req.body.password;
-
-  // Verifica se o usuário preencheu identifier e senha
-  if (!identifier || !userPassword) {
+  if (!email || !password) {
     return res.status(400).json({
       success: false,
-      message: "Por favor, informe seu e-mail ou nome de usuário e sua senha.",
+      message: "Por favor, informe seu e-mail e sua senha.",
     });
   }
 
-  // Monta a query para buscar por email OU username
-  const query = `
-    SELECT * FROM User 
-    WHERE (email = ? OR username = ?) AND password = ?
-  `;
-  const params = [identifier, identifier, userPassword];
-
-  connection.query(query, params, (err, result) => {
+  const query = 'SELECT * FROM User WHERE email = ?';
+  
+  connection.query(query, [email], async (err, results) => {
     if (err) {
       return res.status(500).json({
         success: false,
-        message: "Erro ao buscar usuário no banco de dados",
+        message: "Erro ao buscar usuário",
         error: err,
       });
     }
 
-    if (result.length > 0) {
-      return res.status(200).json({
-        success: true,
-        message: "Login realizado com sucesso!",
-        data: result[0],
-      });
-    } else {
+    if (results.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Usuário ou senha incorretos.",
+        message: "Usuário não encontrado",
       });
     }
+
+    const user = results[0];
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Senha incorreta",
+      });
+    }
+
+    // Se chegou aqui, login é válido
+    const jwt = require('jsonwebtoken');
+    const token = jwt.sign(
+      { userId: user.id },
+      'senhaSecreta',
+      { expiresIn: '1h' }
+    );
+    return res.status(200).json({
+      success: true,
+      message: "Login realizado com sucesso!",
+      data: {
+        id: user.id,
+        email: user.email,
+        username: user.username
+      },
+      token: "tokeni" 
+    });
   });
 };
-
 // ------------------------------- Edit User -------------------------------
 
-exports.updateUser = (req, res) => {
+const updateUser = (req, res) => {
 
   const userEmail = req.body.email
   const userPassword = req.body.password
@@ -146,7 +165,7 @@ exports.updateUser = (req, res) => {
 
 // ------------------------------- View User -------------------------------
 
-exports.viewUser = (req, res) => {
+const viewUser = (req, res) => {
 
   const userId = Number(req.params.id); //garaintir que seja um número válido
 
@@ -185,7 +204,7 @@ exports.viewUser = (req, res) => {
 
 // ------------------------------- Delete User -------------------------------
 
-exports.deleteUser = (req, res) => {
+const deleteUser = (req, res) => {
   const userId = Number(req.params.id);
 
   if (!Number.isInteger(userId) || userId <= 0) {
@@ -225,6 +244,10 @@ exports.deleteUser = (req, res) => {
   });
 };
 
-
-
-
+module.exports = {
+  createUser,
+  loginUser,
+  updateUser,
+  viewUser,
+  deleteUser
+};
