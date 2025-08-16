@@ -1,10 +1,13 @@
+//este arquivo é responsável por gerenciar o estado de autenticação do usuário
+//ele utiliza o AsyncStorage para armazenar o token do usuário e fornecer funções de login e logout
+
 import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [userToken, setUserToken] = useState(null);
+  const [userToken, setUserToken] = useState(null); //Chave que prova que o usuário está logado
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -31,7 +34,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  useEffect(() => {
+  useEffect(() => { //Quando o aplicativo é iniciado, ele tenta carregar o token do AsyncStorage (verifica se o usuário está logado)
     const loadToken = async () => {
       try {
         const token = await AsyncStorage.getItem('userToken');

@@ -12,8 +12,8 @@ const createUser = async (req, res) => {
     }
 
     // Verifica se já existe
-    const checkSql = 'SELECT * FROM User WHERE email = ? OR username = ?';
-    connection.query(checkSql, [email, username], async (err, rows) => {
+    const checkQuery = 'SELECT * FROM User WHERE email = ? OR username = ?';
+    connection.query(checkQuery, [email, username], async (err, rows) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ message: 'Erro no servidor' });
@@ -23,12 +23,12 @@ const createUser = async (req, res) => {
         return res.status(409).json({ message: 'E-mail ou nome de usuário já cadastrado' });
       }
 
-      // Gera hash da senha
-      const hashedPassword = await bcrypt.hash(password, 10);
+    
+      const hashedPassword = await bcrypt.hash(password, 10);   // Gera hash da senha nessa linha
 
-      // Insere no banco
-      const insertSql = 'INSERT INTO User (email, password, username) VALUES (?, ?, ?)';
-      connection.query(insertSql, [email, hashedPassword, username], (err, result) => {
+ 
+      const insertQuery = 'INSERT INTO User (email, password, username) VALUES (?, ?, ?)';
+      connection.query(insertQuery, [email, hashedPassword, username], (err, result) => {
         if (err) {
           console.error(err);
           return res.status(500).json({ message: 'Erro ao cadastrar usuário' });
@@ -74,7 +74,7 @@ const loginUser = async (req, res) => {
     }
 
     const user = results[0];
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(password, user.password); // Verifica se a senha informada bate com a hash armazenada (mesmo criptografada)
 
     if (!passwordMatch) {
       return res.status(401).json({

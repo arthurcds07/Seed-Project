@@ -1,3 +1,8 @@
+//este arquivo é responsável por gerenciar o estado da dieta do usuário
+//ele fornece funções para adicionar, atualizar e remover refeições e alimentos
+
+//o arquivo armazenna os dados na memória do state!
+
 import React, { createContext, useState, useContext } from 'react';
 import { Alert } from 'react-native';
 import { API_ENDPOINTS } from '../config/api';

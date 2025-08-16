@@ -1,13 +1,12 @@
 // src/controllers/AuthController.js
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt'); // use se suas senhas estiverem hashadas
-const connection = require('../config/db'); // sua conexão mysql2 (callback)
+const bcrypt = require('bcrypt'); 
+const connection = require('../config/db'); 
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body; //validando se email e senha foram informados
 
-    // 1) valida
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -15,8 +14,7 @@ exports.login = async (req, res) => {
       });
     }
 
-    // 2) busca usuário
-    const sql = 'SELECT * FROM User WHERE email = ?'; // ATENÇÃO: nome da tabela! "User" vs "users"
+    const sql = 'SELECT * FROM User WHERE email = ?'; 
     connection.query(sql, [email], async (err, rows) => {
       if (err) {
         console.error('Erro no SELECT:', err);
@@ -28,12 +26,11 @@ exports.login = async (req, res) => {
         return res.status(404).json({ success: false, message: 'Usuário não encontrado' });
       }
 
-      // 3) compara senha
-      // Se você SALVOU hash com bcrypt no cadastro:
-      // const ok = await bcrypt.compare(password, user.password);
+     
+      // const ok = password === user.password; //Comparando senha em texto puro (não recomendado mas vou deixar aqui caso de erro usar mais tarde)
 
-      // Se está usando senha em TEXTO PURO (não recomendado):
-      const ok = password === user.password;
+
+      const ok = await bcrypt.compare(password, user.password); //senha comparada com bcrypt 
 
       if (!ok) {
         return res.status(401).json({ success: false, message: 'Senha inválida' });
