@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, Modal } from 'react-native';
 import { useDiet } from '../context/DietContext';
+import { AuthContext } from '../context/AuthContext';
 
 const DietScreen = () => {
   const { meals, addMeal, updateMeal, deleteMeal, addFoodToMeal } = useDiet();
+  const { userToken, user } = useContext(AuthContext);
   const [foodIdInput, setFoodIdInput] = useState('');
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [editingMeal, setEditingMeal] = useState(null);
   const [newMealName, setNewMealName] = useState('');
+
+  console.log(userToken)
 
   const handleAddFood = () => {
     if (selectedMeal && foodIdInput) {

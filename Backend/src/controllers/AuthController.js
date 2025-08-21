@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt'); 
 const connection = require('../config/db'); 
 
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body; //validando se email e senha foram informados

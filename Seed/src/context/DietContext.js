@@ -3,7 +3,7 @@
 
 //o arquivo armazenna os dados na memória do state!
 
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { API_ENDPOINTS } from '../config/api';
 
@@ -11,6 +11,9 @@ const DietContext = createContext();
 
 export const DietProvider = ({ children, user }) => {
   const [meals, setMeals] = useState([]);
+
+  //Pegar id do user logado
+  //os alimentos vão ser pegos do banco de acordo com o user.id
 
   const addMeal = () => {
     const newMeal = {

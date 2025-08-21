@@ -23,6 +23,22 @@ CREATE TABLE Alimentos (
   unidade_medida VARCHAR(50) DEFAULT '100g'
 );
 
+CREATE TABLE Refeicoes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario INT NOT NULL,
+  foreign key (id_alimento) references Alimentos(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  foreign key (id_usuario) references User(id) ON DELETE CASCADE ON UPDATE CASCADE,
+);
+
+CREATE TABLE AlimentosRefeicoes (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  id_alimento INT NOT NULL,
+  id_refeicao INT NOT NULL,
+  quantidade INT NOT NULL, -- quantidade em gramas
+  foreign key (id_alimento) references Alimentos(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  foreign key (id_refeicao) references Refeicoes(id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 INSERT INTO alimentos (nome, categoria, calorias, proteina, carboidrato, gordura, fibra) VALUES
 ('Arroz branco cozido', 'Cereais', 128.0, 2.5, 28.0, 0.2, 1.6),
 ('Feijão carioca cozido', 'Leguminosas', 76.0, 4.8, 13.6, 0.5, 8.5),

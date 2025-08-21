@@ -67,7 +67,94 @@ const getFoodById = async (req, res) => {
   });
 };
 
+//para aparecer a caixa de refeição de acordo com o usuario logado
+const getUserMeals = (req, res) => {
+  const {id} = req.params;
+
+  const query = `SELECT * FROM Refeicoes WHERE id_usuario = ?`;
+
+  connection.query(query, [id], (err, results) => {
+    if (err) {
+      console.error('Erro no banco:', err);
+      return res.status(500).json({
+        success: false,
+        message: "Erro no servidor"
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: results
+    });
+  });
+}
+
+const getMealFoods = (req, res) => {
+  const {id} = req.params;
+
+  const query = 'SELECT * FROM AlimentosRefeicoes WHERE id_refeicao = ?';
+
+  connection.query(query, [id], (err, results) => {
+    if (err) {
+      console.error('Erro no banco:', err);
+      return res.status(500).json({
+        success: false,
+        message: "Erro no servidor"
+      });
+    }
+    res.status(200).json({
+      success: true,
+      data: results
+    });
+  });
+}
+
+const createMeal = (req, res) => {
+  const {id_usuario, nome} = req.body;
+
+  const query = 'INSERT INTO Refeicoes (id_usuario, nome) VALUES (?, ?)';
+
+  connection.query(query, [id_usuario, nome], (err, result) => {
+    if (err) {
+      console.error('Erro no banco:', err);
+      return res.status(500).json({
+        success: false,
+        message: "Erro no servidor"
+      });
+    }
+    res.status(201).json({
+      success: true,
+      message: "Refeição criada com sucesso",
+      mealId: result.insertId
+    });
+  });
+}
+
+const createFood = (req, res) => {
+  const {id_alimento, id_refeicao, quantidade} = req.body;
+
+  const query = 'INSERT INTO AlimentosRefeicoes (id_alimento, id_refeicao, quantidade) VALUES (?, ?, ?)';
+
+  connection.query(query, [id_alimento, id_refeicao, quantidade], (err, result) => {
+    if (err) {
+      console.error('Erro no banco:', err);
+      return res.status(500).json({
+        success: false,
+        message: "Erro no servidor"
+      });
+    }
+    res.status(201).json({
+      success: true,
+      message: "Alimento adicionado à refeição com sucesso",
+      foodMealId: result.insertId
+    });
+  });
+}
+
 module.exports = {
   getAllFoods,
-  getFoodById
+  getFoodById,
+  getUserMeals,
+  getMealFoods,
+  createMeal,
+  createFood
 };
