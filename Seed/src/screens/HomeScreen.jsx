@@ -1,6 +1,6 @@
 import React, { useContext }from "react";
 import { View, TouchableOpacity, Image, Text, StyleSheet } from "react-native";
-import { GestureDetector, Gesture } from "react-native-gesture-handler"; // Corrigido o import
+import { GestureDetector, Gesture } from "react-native-gesture-handler"; 
 import Animated, {
     useAnimatedStyle,
     withSpring,
@@ -14,12 +14,12 @@ const HomeScreen = ({ navigation }) => {
 
     const translateY = useSharedValue(0);
 
-    // Nova API de gestos (Reanimated v3 + Gesture Handler v2)
-    const panGesture = Gesture.Pan()
-        .onStart(() => {
-            // Inicializa o gesto
+    
+    const panGesture = Gesture.Pan() //cria um gesto de arrastar, detectando o movimento do dedo na tela
+        .onStart(() => { 
+            // Vai executar quando o gesto começar
         })
-        .onUpdate((event) => {
+        .onUpdate((event) => { //serve pra quando 
             if (event.translationY < 0) {
                 translateY.value = event.translationY;
             }

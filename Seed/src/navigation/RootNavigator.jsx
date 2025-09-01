@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { View, ActivityIndicator } from 'react-native'; // Adicionei os imports faltantes
+import { View, ActivityIndicator } from 'react-native'; 
 import { AuthContext } from '../context/AuthContext';
 import AppStack from './AppStack';
 import AuthStack from './AuthStack';

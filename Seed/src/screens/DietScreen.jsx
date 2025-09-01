@@ -2,6 +2,13 @@ import React, { useContext, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, Modal } from 'react-native';
 import { useDiet } from '../context/DietContext';
 import { AuthContext } from '../context/AuthContext';
+import { GestureDetector, Gesture } from "react-native-gesture-handler"; 
+import Animated, {
+    useAnimatedStyle,
+    withSpring,
+    useSharedValue,
+    runOnJS,
+} from "react-native-reanimated";
 
 const DietScreen = () => {
   const { meals, addMeal, updateMeal, deleteMeal, addFoodToMeal } = useDiet();
@@ -28,8 +35,40 @@ const DietScreen = () => {
     }
   };
 
+  const translateY = useSharedValue(0);
+    
+  const panGesture = Gesture.Pan() //cria um gesto de arrastar, detectando o movimento do dedo na tela
+      .onStart(() => { 
+          // Vai executar quando o gesto começar
+      })
+      .onUpdate((event) => { //serve pra quando 
+          if (event.translationY > 0) {
+              translateY.value = event.translationY;
+          }
+      })
+      .onEnd((event) => {
+          if (event.translationY > 100) {
+            runOnJS(() => navigation.goBack())();
+          }
+          translateY.value = withSpring(0);
+      });
+
+  const animatedStyle = useAnimatedStyle(() => {
+      return {
+          transform: [{ translateY: translateY.value }],
+          opacity: 1 - Math.min(0.5, Math.abs(translateY.value / 200)),
+      };
+  });
+
+
   return (
+    
     <View style={styles.container}>
+       
+    <GestureDetector gesture={panGesture}>
+    <Animated.View style={[styles.content, animatedStyle]}>
+        <Text style={styles.title}>essa é a tela da rede social!</Text>
+
       {meals.map(meal => (
         <View key={meal.id} style={styles.mealCard}>
           {editingMeal === meal.id ? (
@@ -117,6 +156,12 @@ const DietScreen = () => {
       <TouchableOpacity style={styles.newMealButton} onPress={addMeal}>
         <Text style={styles.buttonText}>+ Adicionar Refeição</Text>
       </TouchableOpacity>
+    <View style={[styles.footer]}>
+        <Text>^^^^^^^^^^^^</Text>
+        <Text style={styles.hint}>Arraste para baixo!</Text>
+    </View>
+    </Animated.View>
+    </GestureDetector>
     </View>
   );
 };
