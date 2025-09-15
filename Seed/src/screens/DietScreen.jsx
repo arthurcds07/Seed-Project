@@ -10,7 +10,10 @@ import Animated, {
     runOnJS,
 } from "react-native-reanimated";
 
+import { useNavigation } from '@react-navigation/native';
+
 const DietScreen = () => {
+  const navigation = useNavigation();
   const { meals, addMeal, updateMeal, deleteMeal, addFoodToMeal } = useDiet();
   const { userToken, user } = useContext(AuthContext);
   const [foodIdInput, setFoodIdInput] = useState('');
@@ -48,7 +51,7 @@ const DietScreen = () => {
       })
       .onEnd((event) => {
           if (event.translationY > 100) {
-            runOnJS(() => navigation.goBack())();
+             runOnJS(navigation.navigate)('Home');
           }
           translateY.value = withSpring(0);
       });

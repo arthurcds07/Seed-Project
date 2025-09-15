@@ -8,6 +8,7 @@ import Animated, {
     runOnJS,
 } from "react-native-reanimated";
 import { AuthContext } from "../context/AuthContext";
+import DrawerMenu from "../components/DrawerMenu";
 
 const HomeScreen = ({ navigation }) => {
     const { signOut } = useContext(AuthContext);
@@ -41,12 +42,7 @@ const HomeScreen = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                    <Image
-                        source={require("../../assets/Menu.png")}
-                        style={{ width: 32, height: 32 }}
-                    />
-                </TouchableOpacity>
+               <DrawerMenu />
                 <TouchableOpacity onPress={() => { signOut() }}
                 >
                     <Image
