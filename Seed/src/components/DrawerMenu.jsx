@@ -1,20 +1,22 @@
 import React from 'react';
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const DrawerMenu = () => {
-    const navigation = useNavigation(); 
+const MenuButton = () => {
+  const navigation = useNavigation();
 
-    return(
-        <View>
-            <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-                <Text >Home</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigation.navigate('Diet')}>
-                
-            </TouchableOpacity>
-        </View>
-    );
+  return (
+    <TouchableOpacity style={styles.button} onPress={() => navigation.openDrawer()}>
+      <Text style={styles.icon}>☰</Text>
+    </TouchableOpacity>
+  );
 };
 
-export default DrawerMenu;
+const styles = StyleSheet.create({
+  icon: {
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
+});
+
+export default MenuButton;

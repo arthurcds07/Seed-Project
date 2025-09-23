@@ -70,7 +70,7 @@ const DietScreen = () => {
        
     <GestureDetector gesture={panGesture}>
     <Animated.View style={[styles.content, animatedStyle]}>
-        <Text style={styles.title}>essa é a tela da rede social!</Text>
+        
 
       {meals.map(meal => (
         <View key={meal.id} style={styles.mealCard}>
@@ -159,10 +159,6 @@ const DietScreen = () => {
       <TouchableOpacity style={styles.newMealButton} onPress={addMeal}>
         <Text style={styles.buttonText}>+ Adicionar Refeição</Text>
       </TouchableOpacity>
-    <View style={[styles.footer]}>
-        <Text>^^^^^^^^^^^^</Text>
-        <Text style={styles.hint}>Arraste para baixo!</Text>
-    </View>
     </Animated.View>
     </GestureDetector>
     </View>

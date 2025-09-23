@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { View, ActivityIndicator } from 'react-native'; 
 import { AuthContext } from '../context/AuthContext';
-import AppStack from './AppStack';
+import DrawerNavigator from './DrawerNavigator';
 import AuthStack from './AuthStack';
 
 export default function RootNavigator() {
@@ -21,7 +21,7 @@ export default function RootNavigator() {
 
   return (
     <NavigationContainer>
-      {userToken ? <AppStack /> : <AuthStack />}
+      {userToken ? <DrawerNavigator /> : <AuthStack />}
     </NavigationContainer>
   );
 }
