@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useContext } from 'react';
 import {
   View, Text, Button, StyleSheet, Alert,
@@ -9,7 +7,7 @@ import {
 import api from '../config/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker'; // <-- Novo
+import * as ImagePicker from 'expo-image-picker'; 
 
 const SocialScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
@@ -20,7 +18,7 @@ const SocialScreen = ({ navigation }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [userLikes, setUserLikes] = useState({});
   const [currentUserId, setCurrentUserId] = useState(null);
-  const [newPostImageUri, setNewPostImageUri] = useState(null); // <-- Novo: URI da imagem do novo post
+  const [newPostImageUri, setNewPostImageUri] = useState(null); 
   const [user, setUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -93,7 +91,7 @@ const SocialScreen = ({ navigation }) => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3], // Ajuste conforme preferir
+      aspect: [4, 3], 
       quality: 0.8,
     });
 

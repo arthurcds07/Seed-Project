@@ -10,6 +10,6 @@ export const API_ENDPOINTS = {
   LOGIN: `${rota}/user/login`, 
   REGISTER: `${rota}/user/create`, 
   FOODS: `${rota}/foods`,
-  MEALS: `${rota}/meals`
-  
+  MEALS: `${rota}/meals`,
+  POSTS: `${rota}/posts`,
 };
