@@ -8,6 +8,7 @@ import api from '../config/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker'; 
+import DrawerMenu from '../components/DrawerMenu';
 
 const SocialScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
@@ -263,6 +264,7 @@ return (
   <View style={styles.container}>
     {/* Header */}
     <View style={styles.header}>
+    <DrawerMenu />
       <View style={styles.headerButtons}>
         <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.profileButton}>
           {user?.profile_picture_url ? (
@@ -275,9 +277,6 @@ return (
           )}
         </TouchableOpacity>
         {user && <Text style={styles.username}>Olá, {user.username}</Text>}
-        <TouchableOpacity onPress={handleLogout} style={styles.logOutButton}>
-          <Text style={styles.logOutButtonText}>Sair</Text>
-        </TouchableOpacity>
       </View>
     </View>
 
