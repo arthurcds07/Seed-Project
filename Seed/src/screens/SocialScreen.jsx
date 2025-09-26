@@ -4,7 +4,7 @@ import {
   FlatList, TextInput, TouchableOpacity, ActivityIndicator, Image, Modal, ScrollView
 } from 'react-native';
 
-import api from '../config/api';
+import api, { API_ENDPOINTS } from '../config/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker'; 
@@ -60,7 +60,10 @@ const SocialScreen = ({ navigation }) => {
   const fetchPosts = async () => {
     setLoadingPosts(true);
     try {
-      const response = await api.get(`/posts?q=${searchTerm}`);
+      const response = await api.get(API_ENDPOINTS.POSTS, {
+        params: searchTerm ? { q: searchTerm } : {},
+        headers: { Authorization: `Bearer ${await AsyncStorage.getItem('userToken')}` }
+      });
 
       // Atualiza o estado de likes do usuário com base nos posts buscados
       // Para o feedback visual persistente, esta parte é crucial

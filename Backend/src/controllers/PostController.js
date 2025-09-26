@@ -1,7 +1,7 @@
-const connection = require('../../db');
+const connection = require('../config/db');
 
 // Obter todos os posts
-exports.getAllPosts = async (req, res) => {
+const getAllPosts = async (req, res) => {
   try {
     const [rows] = await connection.query(`
       SELECT
@@ -21,7 +21,7 @@ exports.getAllPosts = async (req, res) => {
 };
 
 // Criar um novo post
-exports.createPost = async (req, res) => {
+const createPost = async (req, res) => {
   const { title, content, image_url } = req.body;
   const userId = req.user.id; // Vem do middleware de autenticação (que vamos criar)
 
@@ -42,7 +42,7 @@ exports.createPost = async (req, res) => {
 };
 
 // Obter um único post por ID
-exports.getPostById = async (req, res) => {
+const getPostById = async (req, res) => {
   const { id } = req.params;
   try {
     const [rows] = await connection.query(`
@@ -66,7 +66,7 @@ exports.getPostById = async (req, res) => {
   }
 };
 
-exports.toggleLike = async (req, res) => {
+const toggleLike = async (req, res) => {
   const { postId } = req.params;
   const userId = req.user.id; // ID do usuário autenticado
 
@@ -93,7 +93,7 @@ exports.toggleLike = async (req, res) => {
 };
 
 // Função para favoritar/desfavoritar um post
-exports.toggleFavorite = async (req, res) => {
+const toggleFavorite = async (req, res) => {
   const { postId } = req.params;
   const userId = req.user.id; // ID do usuário autenticado
 
@@ -120,7 +120,7 @@ exports.toggleFavorite = async (req, res) => {
 };
 
 // Função para buscar posts (com ou sem termo de pesquisa)
-exports.searchPosts = async (req, res) => {
+const searchPosts = async (req, res) => {
   const { q } = req.query; // Termo de pesquisa da URL (ex: ?q=termo)
   let query = `
     SELECT
@@ -149,3 +149,12 @@ exports.searchPosts = async (req, res) => {
     res.status(500).json({ message: 'Erro interno do servidor ao buscar/pesquisar posts.' });
   }
 };
+
+module.exports = {
+  getAllPosts,
+  createPost,
+  getPostById,
+  toggleLike,
+  toggleFavorite,
+  searchPosts
+}

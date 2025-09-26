@@ -9,6 +9,7 @@ const rota = 'http://192.168.1.10:3003/api';
 export const API_ENDPOINTS = {
   LOGIN: `${rota}/user/login`, 
   REGISTER: `${rota}/user/create`, 
+  GETUSER: `${rota}/user`,
   FOODS: `${rota}/foods`,
   MEALS: `${rota}/meals`,
   POSTS: `${rota}/posts`,

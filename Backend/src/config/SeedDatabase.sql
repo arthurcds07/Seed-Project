@@ -6,7 +6,7 @@ CREATE TABLE User (
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     username VARCHAR(255) NOT NULL UNIQUE,
-	profile_picture VARCHAR(255), -- vou armazenar em outro lugar e deixar só a URL no banco
+	profile_picture VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -26,18 +26,19 @@ CREATE TABLE Alimentos (
 CREATE TABLE Refeicoes (
   id INT AUTO_INCREMENT PRIMARY KEY,
   id_usuario INT NOT NULL,
-  foreign key (id_alimento) references Alimentos(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  foreign key (id_usuario) references User(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (id_usuario) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
 
 CREATE TABLE AlimentosRefeicoes (
   id INT AUTO_INCREMENT PRIMARY KEY,
   id_alimento INT NOT NULL,
   id_refeicao INT NOT NULL,
-  quantidade INT NOT NULL, -- quantidade em gramas
-  foreign key (id_alimento) references Alimentos(id) ON DELETE CASCADE ON UPDATE CASCADE,
-  foreign key (id_refeicao) references Refeicoes(id) ON DELETE CASCADE ON UPDATE CASCADE
+  quantidade INT NOT NULL,
+  FOREIGN KEY (id_alimento) REFERENCES Alimentos(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (id_refeicao) REFERENCES Refeicoes(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
+
 
 INSERT INTO alimentos (nome, categoria, calorias, proteina, carboidrato, gordura, fibra) VALUES
 ('Arroz branco cozido', 'Cereais', 128.0, 2.5, 28.0, 0.2, 1.6),
@@ -90,7 +91,7 @@ CREATE TABLE posts (
     image_url VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE   
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE   
 );
 
 CREATE TABLE comments (
@@ -100,7 +101,7 @@ CREATE TABLE comments (
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
 CREATE TABLE likes (
@@ -109,7 +110,7 @@ CREATE TABLE likes (
     user_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
     UNIQUE (post_id, user_id)  
 );
 
@@ -119,6 +120,6 @@ CREATE TABLE favorites(
     user_id INT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
     UNIQUE (post_id, user_id)
 );
