@@ -18,4 +18,4 @@ app.use('/api/user', userRoutes);
 app.use('/api/foods', foodRouter);
 app.use('/api/posts', postRouter);
 
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));   

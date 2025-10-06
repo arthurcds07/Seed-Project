@@ -1,8 +1,8 @@
-// ------------------------------- Create User --------------------------------
 // src/controllers/UserController.js
 const bcrypt = require('bcrypt');
 const connection = require('../config/db');
 
+// ------------------------------- Create User --------------------------------
 const createUser = async (req, res) => {
   try {
     const { email, password, username } = req.body;
@@ -187,7 +187,6 @@ const deleteUser = (req, res) => {
 
 module.exports = {
   createUser,
-  loginUser,
   updateUser,
   viewUser,
   deleteUser
