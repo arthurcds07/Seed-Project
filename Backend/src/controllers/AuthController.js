@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const connection = require('../config/db'); 
 
 
-exports.login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body; //validando se email e senha foram informados
 
@@ -37,23 +37,36 @@ exports.login = async (req, res) => {
         return res.status(401).json({ success: false, message: 'Senha inválida' });
       }
 
+      console.log('Usuário autenticado, gerando token...');
       // 4) gera JWT
-      const token = jwt.sign(
-        { id: user.id, email: user.email, username: user.username },
-        process.env.JWT_SECRET || 'dev-secret',
+      const token = jwt.sign({
+        id: user.id,
+        email: user.email,
+        username: user.username
+      },
+        process.env.JWT_SECRET,
         { expiresIn: '1h' }
       );
+
+      console.log("JWT_SECRET carregado:", process.env.JWT_SECRET);
 
       // 5) responde
       return res.status(200).json({
         success: true,
         message: 'Login realizado com sucesso',
         token,
-        data: { id: user.id, email: user.email, username: user.username },
+        data: { 
+          id: user.id,
+          email: user.email, 
+          username: user.username
+        },
       });
     });
   } catch (e) {
     console.error('Erro no login:', e);
-    return res.status(500).json({ success: false, message: 'Erro no servidor' });
+    return res.status(500).json({ success: false, message: 'Erro no servidor', error: error.message });
   }
 };
+
+
+module.exports = {login};

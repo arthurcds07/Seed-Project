@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 // Chave secreta para assinar e verificar tokens JWT (a mesma usada em authController.js)
-const jwtSecret = process.env.JWT_SECRET || 'senhajwt'; // Use a mesma do controller!
+const jwtSecret = process.env.JWT_SECRET; // Use a mesma do controller!
 
 exports.verifyToken = (req, res, next) => {
   // Obter o token do cabeçalho de autorização

@@ -4,7 +4,7 @@
 // const rota = 'http://localhost:3003/api';
 
 // Celular
-const rota = 'http://192.168.1.10:3003/api';
+const rota = 'http://172.20.91.197:3003/api';
 
 export const API_ENDPOINTS = {
   LOGIN: `${rota}/user/login`, 

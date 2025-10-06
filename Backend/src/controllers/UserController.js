@@ -43,65 +43,6 @@ const createUser = async (req, res) => {
   }
 };
 
-// -------------------------------- Login User --------------------------------
-
-const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({
-      success: false,
-      message: "Por favor, informe seu e-mail e sua senha.",
-    });
-  }
-
-  const query = 'SELECT * FROM User WHERE email = ?';
-  
-  connection.query(query, [email], async (err, results) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        message: "Erro ao buscar usuário",
-        error: err,
-      });
-    }
-
-    if (results.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Usuário não encontrado",
-      });
-    }
-
-    const user = results[0];
-    const passwordMatch = await bcrypt.compare(password, user.password); // Verifica se a senha informada bate com a hash armazenada (mesmo criptografada)
-
-    if (!passwordMatch) {
-      return res.status(401).json({
-        success: false,
-        message: "Senha incorreta",
-      });
-    }
-
-    // Se chegou aqui, login é válido
-    const jwt = require('jsonwebtoken');
-    const token = jwt.sign(
-      { userId: user.id },
-      'senhaSecreta',
-      { expiresIn: '1h' }
-    );
-    return res.status(200).json({
-      success: true,
-      message: "Login realizado com sucesso!",
-      data: {
-        id: user.id,
-        email: user.email,
-        username: user.username
-      },
-      token: "tokeni" 
-    });
-  });
-};
 // ------------------------------- Edit User -------------------------------
 
 const updateUser = (req, res) => {
