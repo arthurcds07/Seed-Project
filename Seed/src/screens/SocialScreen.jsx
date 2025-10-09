@@ -29,14 +29,15 @@ const SocialScreen = ({ navigation }) => {
     const loadUserIdAndData = async () => {
       try {
         const userDataString = await AsyncStorage.getItem('userData');
+        console.log(userDataString)
         if (userDataString) {
-          const userData = JSON.parse(userDataString);
+          const userData = JSON.stringify(userDataString);
           setCurrentUserId(userData.id);
         }
         // Buscar dados completos do usuário logado
         const userToken = await AsyncStorage.getItem('userToken');
         if (userToken) {
-          const userResponse = await api.get('/users/me', {
+          const userResponse = await api.get(`${API_ENDPOINTS.GETUSER}/${userData.id}`, {
             headers: { Authorization: `Bearer ${userToken}` }
           });
           setUser(userResponse.data);

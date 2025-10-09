@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log("Armazenando token:", token);
       await AsyncStorage.setItem('userToken', token);
+      await AsyncStorage.setItem('userData', userData)
       console.log("Token armazenado");
       setUserToken(token);
       setUser(userData);
