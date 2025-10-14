@@ -4,7 +4,7 @@ import {
   FlatList, TextInput, TouchableOpacity, ActivityIndicator, Image, Modal, ScrollView
 } from 'react-native';
 
-import api, { API_ENDPOINTS } from '../config/api';
+import { API_ENDPOINTS } from '../config/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker'; 
@@ -22,6 +22,7 @@ const SocialScreen = ({ navigation }) => {
   const [newPostImageUri, setNewPostImageUri] = useState(null); 
   const [user, setUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  
 
 
   
@@ -31,13 +32,14 @@ const SocialScreen = ({ navigation }) => {
         const userDataString = await AsyncStorage.getItem('userData');
         console.log(userDataString)
         if (userDataString) {
-          const userData = JSON.stringify(userDataString);
+          const userData = JSON.parse(userDataString);
+          console.log('Dados do usuário carregados:', userData);
           setCurrentUserId(userData.id);
         }
         // Buscar dados completos do usuário logado
         const userToken = await AsyncStorage.getItem('userToken');
         if (userToken) {
-          const userResponse = await api.get(`${API_ENDPOINTS.GETUSER}/${userData.id}`, {
+          const userResponse = await axios.get(`${API_ENDPOINTS.GETUSER}/${userData.id}`, {
             headers: { Authorization: `Bearer ${userToken}` }
           });
           setUser(userResponse.data);

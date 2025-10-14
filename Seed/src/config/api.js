@@ -4,11 +4,11 @@
 // const rota = 'http://localhost:3003/api';
 
 // Celular
-const rota = 'http://172.20.91.188:3003/api';
+const rota = 'http://172.20.90.174.188:3003/api';
 
 
 export const API_ENDPOINTS = {
-  LOGIN: `http://172.20.91.188:3003/auth/login`, 
+  LOGIN: `http://172.20.90.174:3003/auth/login`, 
   REGISTER: `${rota}/user/create`, 
   GETUSER: `${rota}/user`,
   FOODS: `${rota}/foods`,
