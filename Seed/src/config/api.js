@@ -6,6 +6,11 @@
 // Celular
 const rota = 'http://172.20.90.174.188:3003/api';
 
+// Instância do axios
+const api = axios.create({
+  baseURL: rota,
+  timeout: 10000, //tempo limite de 10 segundos
+});
 
 export const API_ENDPOINTS = {
   LOGIN: `http://172.20.90.174:3003/auth/login`, 
