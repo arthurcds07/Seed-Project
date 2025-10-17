@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker'; 
 import DrawerMenu from '../components/DrawerMenu';
+import axios from 'axios';
 
 const SocialScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
@@ -30,9 +31,11 @@ const SocialScreen = ({ navigation }) => {
     const loadUserIdAndData = async () => {
       try {
         const userDataString = await AsyncStorage.getItem('userData');
-        console.log(userDataString)
+        console.log(userDataString);
+        let userData = null;
         if (userDataString) {
-          const userData = JSON.parse(userDataString);
+          
+          userData = JSON.parse(userDataString);
           console.log('Dados do usuário carregados:', userData);
           setCurrentUserId(userData.id);
         }
@@ -63,7 +66,7 @@ const SocialScreen = ({ navigation }) => {
   const fetchPosts = async () => {
     setLoadingPosts(true);
     try {
-      const response = await api.get(API_ENDPOINTS.POSTS, {
+      const response = await axios.get(API_ENDPOINTS.POSTS, {
         params: searchTerm ? { q: searchTerm } : {},
         headers: { Authorization: `Bearer ${await AsyncStorage.getItem('userToken')}` }
       });

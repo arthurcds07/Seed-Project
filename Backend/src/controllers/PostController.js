@@ -10,7 +10,7 @@ const getAllPosts = async (req, res) => {
           (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.id) AS likes_count,
           (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count
       FROM posts p
-      JOIN users u ON p.user_id = u.id
+      JOIN user u ON p.user_id = u.id
       ORDER BY p.created_at DESC
     `);
     res.status(200).json(rows);
@@ -52,7 +52,7 @@ const getPostById = async (req, res) => {
           (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.id) AS likes_count,
           (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count
       FROM posts p
-      JOIN users u ON p.user_id = u.id
+      JOIN user u ON p.user_id = u.id
       WHERE p.id = ?
     `, [id]);
 
@@ -129,7 +129,7 @@ const searchPosts = async (req, res) => {
         (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.id) AS likes_count,
         (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count
     FROM posts p
-    JOIN users u ON p.user_id = u.id
+    JOIN user u ON p.user_id = u.id
   `;
   let params = [];
 
