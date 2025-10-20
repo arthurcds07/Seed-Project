@@ -5,7 +5,7 @@ import axios from 'axios';
 // const rota = 'http://localhost:3003/api';
 
 // Celular
-const rota = 'http://172.20.91.166:3003/api';
+const rota = 'http://172.20.91.197:3003/api';
 
 // Instância do axios
 const api = axios.create({
@@ -14,10 +14,15 @@ const api = axios.create({
 });
 
 export const API_ENDPOINTS = {
-  LOGIN: `http://172.20.91.166:3003/auth/login`, 
+  LOGIN: `http://172.20.91.197:3003/auth/login`, 
   REGISTER: `${rota}/user/create`, 
   GETUSER: `${rota}/user`,
   FOODS: `${rota}/foods`,
   MEALS: `${rota}/meals`,
   POSTS: `${rota}/posts`,
+  USER_LIKES: (userId) => `${rota}/users/${userId}/likes`,
+  USER_FAVORITES: (userId) => `${rota}/users/${userId}/favorites`,
+  POST_LIKE: (postId) => `${rota}/posts/${postId}/like`,
+  POST_FAVORITE: (postId) => `${rota}/posts/${postId}/favorite`,
+  POST_BY_ID: (postId) => `${rota}/posts/${postId}`,
 };

@@ -76,12 +76,15 @@ const SocialScreen = ({ navigation }) => {
       let initialUserLikes = {};
       if (currentUserId) {
         try {
-          const likesResponse = await api.get(`/users/${currentUserId}/likes`, {
+          const likesResponse = await axios.get(API_ENDPOINTS.USER_LIKES(currentUserId), {
             headers: { Authorization: `Bearer ${await AsyncStorage.getItem('userToken')}` }
           });
-          likesResponse.data.forEach(like => {
+          const likesArray = likesResponse.data.likes || [];
+
+          likesArray.forEach(like => {
             initialUserLikes[like.post_id] = true;
           });
+          
         } catch (likesError) {
           console.error('Erro ao buscar likes do usuário para inicialização:', likesError.response?.data || likesError.message);
         }
@@ -136,7 +139,7 @@ const SocialScreen = ({ navigation }) => {
         });
 
         try {
-          const uploadResponse = await api.post('/upload/post-image', formData, {
+          const uploadResponse = await axios.post('/upload/post-image', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
               'Authorization': `Bearer ${userToken}`,
@@ -151,8 +154,8 @@ const SocialScreen = ({ navigation }) => {
         }
       }
 
-      await api.post(
-        '/posts',
+      await axios.post(
+        API_ENDPOINTS.POSTS,
         { title: newPostTitle, content: newPostContent, image_url: imageUrlToSave }, // Envia a URL da imagem
         { headers: { Authorization: `Bearer ${userToken}` } }
       );
@@ -181,8 +184,8 @@ const SocialScreen = ({ navigation }) => {
         signOut();
         return;
       }
-      const response = await api.post(
-        `/posts/${postId}/like`,
+      const response = await axios.post(
+        API_ENDPOINTS.POST_LIKE(postId),
         {},
         { headers: { Authorization: `Bearer ${userToken}` } }
       );
@@ -218,8 +221,8 @@ const SocialScreen = ({ navigation }) => {
         signOut();
         return;
       }
-      const response = await api.post(
-        `/posts/${postId}/favorite`,
+      const response = await axios.post(
+        API_ENDPOINTS.POST_FAVORITE(postId),
         {},
         { headers: { Authorization: `Bearer ${userToken}` } }
       );

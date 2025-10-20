@@ -6,7 +6,8 @@ const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
     password: 'root',
-    database: 'SeedDatabase'
+    database: 'SeedDatabase',
+
 })
 
 connection.connect((err) => {
@@ -17,4 +18,4 @@ connection.connect((err) => {
     }
 })
 
-module.exports = connection.promise()
+module.exports = connection.promise
