@@ -43,7 +43,7 @@ const SocialScreen = ({ navigation }) => {
           const userResponse = await axios.get(`${API_ENDPOINTS.GETUSER}/${userData.id}`, {
             headers: { Authorization: `Bearer ${userToken}` }
           });
-          setUser(userResponse.data);
+          setUser(userResponse.data.data);
         }
       } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
@@ -239,7 +239,7 @@ const SocialScreen = ({ navigation }) => {
     <View style={styles.postCard}>
       <View style={styles.postHeader}>
         {item.profile_picture_url ? (
-        <Image source={{ uri: `http://192.168.1.10:3001${item.profile_picture_url}` }} style={styles.profilePicture} />
+        <Image source={{ uri: `${API_ENDPOINTS}/${item.profile_picture_url}` }} style={styles.profilePicture} />
         ) : (
           <Ionicons name="person-circle" size={40} color="#ccc" style={styles.profilePicturePlaceholder} />
         )}
@@ -247,7 +247,7 @@ const SocialScreen = ({ navigation }) => {
       </View>
       <Text style={styles.postTitle}>{item.title}</Text>
       <Text style={styles.postContent}>{item.content}</Text>
-      {item.image_url && <Image source={{ uri: `http://192.168.1.10:3001${item.image_url}` }} style={styles.postImage} />}
+      {item.image_url && <Image source={{ uri: `${API_ENDPOINTS}/${item.image_url}` }} style={styles.postImage} />}
       <View style={styles.postFooter}>
         <TouchableOpacity style={styles.interactionButton} onPress={() => handleToggleLike(item.id)}>
           <Ionicons
@@ -279,7 +279,7 @@ return (
         <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.profileButton}>
           {user?.profile_picture_url ? (
             <Image
-              source={{ uri: `http://192.168.1.10:3001${user.profile_picture_url}` }}
+              source={{ uri: `${API_ENDPOINTS}/${user.profile_picture_url}` }}
               style={styles.headerProfilePicture}
             />
           ) : (
