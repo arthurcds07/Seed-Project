@@ -23,8 +23,6 @@ const SocialScreen = ({ navigation }) => {
   const [newPostImageUri, setNewPostImageUri] = useState(null); 
   const [user, setUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
-  
-
 
   
   useEffect(() => {

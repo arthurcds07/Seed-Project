@@ -18,4 +18,4 @@ connection.connect((err) => {
     }
 })
 
-module.exports = connection.promise
+module.exports = connection
