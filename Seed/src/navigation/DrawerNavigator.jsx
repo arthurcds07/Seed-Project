@@ -6,6 +6,8 @@ import DietScreen from '../screens/DietScreen';
 // import ProfileScreen from '../screens/ProfileScreen';
 import { AuthContext } from "../context/AuthContext";
 import SocialScreen from '../screens/SocialScreen';
+import AppStack from './AppStack';
+
 
 const Drawer = createDrawerNavigator();
 
@@ -25,9 +27,17 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="Home" component={HomeScreen} />
       <Drawer.Screen name="Diet" component={DietScreen} />
       <Drawer.Screen name="Social" component={SocialScreen} />
+      
       {/* <Drawer.Screen name="Profile" component={ProfileScreen} /> */}
 
-
+      <Drawer.Screen
+        name="AppStack"
+        component={AppStack}
+        options={{
+        drawerItemStyle: { display: 'none' }, // 👈 oculta do menu lateral
+        headerShown: false
+      }}
+/>
       <Drawer.Screen
         name="Logout"
         component={HomeScreen} // Componente fictício, não será realmente usado

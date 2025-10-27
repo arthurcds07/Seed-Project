@@ -70,7 +70,6 @@ const SocialScreen = ({ navigation }) => {
       });
 
       // Atualiza o estado de likes do usuário com base nos posts buscados
-      // Para o feedback visual persistente, esta parte é crucial
       let initialUserLikes = {};
       if (currentUserId) {
         try {
@@ -258,7 +257,7 @@ const SocialScreen = ({ navigation }) => {
           <Text style={styles.interactionText}>{item.likes_count}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.interactionButton} onPress={() => navigation.navigate('PostDetail', { postId: item.id })}>
+        <TouchableOpacity style={styles.interactionButton} onPress={() => navigation.navigate('AppStack', { screen: 'PostDetail', params: {postId: item.id} })}>
           <Ionicons name="chatbubble-outline" size={24} color="#666" />
           <Text style={styles.interactionText}>{item.comments_count}</Text>
         </TouchableOpacity>
@@ -269,6 +268,8 @@ const SocialScreen = ({ navigation }) => {
       </View>
     </View>
   );
+
+
 
 return (
   <View style={styles.container}>
