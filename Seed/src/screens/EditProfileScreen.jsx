@@ -7,7 +7,8 @@ import {
   Platform // <-- Adicionar Platform aqui
 } from 'react-native';
 import AuthContext from '../context/AuthContext';
-import api from '../services/api';
+import { API_ENDPOINTS } from '../config/api';
+import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
@@ -86,7 +87,7 @@ const EditProfileScreen = ({ route, navigation }) => {
         }
 
         try {
-          const uploadResponse = await api.post('/upload/profile-picture', formData, {
+          const uploadResponse = await axios.post('/upload/profile-picture', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
               'Authorization': `Bearer ${userToken}`,
@@ -123,7 +124,7 @@ const EditProfileScreen = ({ route, navigation }) => {
       }
 
       const response = await api.put(
-        '/users/me',
+        API_ENDPOINTS.UPDATE_USER(initialUser.id),
         filteredUpdateData,
         { headers: { Authorization: `Bearer ${userToken}` } }
       );

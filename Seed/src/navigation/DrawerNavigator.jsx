@@ -7,7 +7,7 @@ import DietScreen from '../screens/DietScreen';
 import { AuthContext } from "../context/AuthContext";
 import SocialScreen from '../screens/SocialScreen';
 import AppStack from './AppStack';
-
+import EditProfileScreen from '../screens/EditProfileScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -27,6 +27,8 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="Home" component={HomeScreen} />
       <Drawer.Screen name="Diet" component={DietScreen} />
       <Drawer.Screen name="Social" component={SocialScreen} />
+      <Drawer.Screen name="EditProfile" component={EditProfileScreen} />
+
       
       {/* <Drawer.Screen name="Profile" component={ProfileScreen} /> */}
 

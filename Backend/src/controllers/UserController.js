@@ -50,7 +50,7 @@ const updateUser = (req, res) => {
   const userEmail = req.body.email
   const userPassword = req.body.password
   const userName = req.body.username
-  const profilePicture = req.body.profile_picture;
+  const profilePicture_url = req.body.profile_picture_url;
 
   const userId = req.params.id;
 

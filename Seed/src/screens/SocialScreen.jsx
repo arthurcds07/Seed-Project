@@ -277,7 +277,7 @@ return (
     <View style={styles.header}>
     <DrawerMenu />
       <View style={styles.headerButtons}>
-        <TouchableOpacity onPress={() => navigation.navigate('Profile')} style={styles.profileButton}>
+        <TouchableOpacity onPress={() => navigation.navigate('EditProfile')} style={styles.profileButton}>
           {user?.profile_picture_url ? (
             <Image
               source={{ uri: `${API_ENDPOINTS}/${user.profile_picture_url}` }}
