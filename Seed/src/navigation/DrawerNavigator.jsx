@@ -8,16 +8,19 @@ import { AuthContext } from "../context/AuthContext";
 import SocialScreen from '../screens/SocialScreen';
 import AppStack from './AppStack';
 import EditProfileScreen from '../screens/EditProfileScreen';
+import CustomDrawerContent from '../components/CustomDrawerContent';
+
 
 const Drawer = createDrawerNavigator();
 
 const DrawerNavigator = () => {
-  const { signOut } = useContext(AuthContext);
+  // const { signOut } = useContext(AuthContext);
 
 
   return (
     <Drawer.Navigator
       initialRouteName="Home"
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
         headerShown: false,
         drawerType: 'slide',
@@ -29,26 +32,23 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="Social" component={SocialScreen} />
       <Drawer.Screen name="EditProfile" component={EditProfileScreen} />
 
-      
-      {/* <Drawer.Screen name="Profile" component={ProfileScreen} /> */}
-
       <Drawer.Screen
         name="AppStack"
         component={AppStack}
         options={{
-        drawerItemStyle: { display: 'none' }, // 👈 oculta do menu lateral
+        drawerItemStyle: { display: 'none' }, //oculta do menu lateral
         headerShown: false
       }}
 />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="Logout"
-        component={HomeScreen} // Componente fictício, não será realmente usado
+        component={HomeScreen} // não será realmente usado
         options={{
           drawerLabel: ({ color }) => (
             <TouchableOpacity style={styles.logOutButton} onPress={() => signOut()}>  
               <Text style={styles.logOutText}>Sair</Text>
             </TouchableOpacity>
-          )}} />
+          )}} /> */}
     </Drawer.Navigator>
   );
 };

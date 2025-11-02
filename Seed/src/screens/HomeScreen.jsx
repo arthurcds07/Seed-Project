@@ -43,13 +43,10 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.container}>
             <View style={styles.header}>
                <DrawerMenu />
-                <TouchableOpacity onPress={() => { signOut() }}
-                >
                     <Image
                         source={require("../../assets/seed-logo.png")}
                         style={{ width: 40, height: 40 }}
                     />
-                </TouchableOpacity>
             </View>
 
 

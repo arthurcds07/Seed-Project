@@ -5,7 +5,7 @@ const getAllPosts = (req, res) => {
   const query = `
     SELECT
         p.id, p.title, p.content, p.image_url, p.created_at, p.updated_at,
-        u.id AS user_id, u.username, u.profile_picture,
+        u.id AS user_id, u.username, u.profile_picture_url,
         (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.id) AS likes_count,
         (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count
     FROM posts p
@@ -50,7 +50,7 @@ const getPostById = (req, res) => {
   const query = `
     SELECT
         p.id, p.title, p.content, p.image_url, p.created_at, p.updated_at,
-        u.id AS user_id, u.username, u.profile_picture,
+        u.id AS user_id, u.username, u.profile_picture_url,
         (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.id) AS likes_count,
         (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count
     FROM posts p
@@ -146,7 +146,7 @@ const searchPosts = (req, res) => {
   let query = `
     SELECT
         p.id, p.title, p.content, p.image_url, p.created_at, p.updated_at,
-        u.id AS user_id, u.username, u.profile_picture,
+        u.id AS user_id, u.username, u.profile_picture_url,
         (SELECT COUNT(*) FROM likes l WHERE l.post_id = p.id) AS likes_count,
         (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id) AS comments_count
     FROM posts p
