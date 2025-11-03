@@ -6,7 +6,7 @@ import {
   ScrollView, ActivityIndicator, Image, TouchableOpacity,
   Platform // <-- Adicionar Platform aqui
 } from 'react-native';
-import AuthContext from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -14,15 +14,16 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 
 const EditProfileScreen = ({ route, navigation }) => {
-  const { user: initialUser } = route.params;
-  const { signOut } = useContext(AuthContext);
 
-  const [username, setUsername] = useState(initialUser.username);
-  const [email, setEmail] = useState(initialUser.email);
+  const { user, setUser, signOut } = useContext(AuthContext);
+
+
+  const [username, setUsername] = useState(user?.username || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [profilePictureUrl, setProfilePictureUrl] = useState(user?.profile_picture_url || '');
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
-  const [profilePictureUrl, setProfilePictureUrl] = useState(initialUser.profile_picture_url);
   const [selectedImageUri, setSelectedImageUri] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -87,6 +88,8 @@ const EditProfileScreen = ({ route, navigation }) => {
         }
 
         try {
+          console.log("Enviando updateData:", filteredUpdateData);
+
           const uploadResponse = await axios.post('/upload/profile-picture', formData, {
             headers: {
               'Content-Type': 'multipart/form-data',
@@ -103,9 +106,9 @@ const EditProfileScreen = ({ route, navigation }) => {
       }
 
       const updateData = {
-        username: username.trim() === initialUser.username ? undefined : username.trim(),
-        email: email.trim() === initialUser.email ? undefined : email.trim(),
-        profile_picture_url: finalProfilePictureUrl === initialUser.profile_picture_url ? undefined : finalProfilePictureUrl,
+        username: username.trim() === user.username ? undefined : username.trim(),
+        email: email.trim() === user.email ? undefined : email.trim(),
+        profile_picture_url: finalProfilePictureUrl === user.profile_picture_url ? undefined : finalProfilePictureUrl,
       };
 
       if (newPassword) {
@@ -123,14 +126,23 @@ const EditProfileScreen = ({ route, navigation }) => {
         return;
       }
 
-      const response = await api.put(
-        API_ENDPOINTS.UPDATE_USER(initialUser.id),
+      const response = await axios.put(
+        API_ENDPOINTS.UPDATE_USER(user.id),
         filteredUpdateData,
         { headers: { Authorization: `Bearer ${userToken}` } }
       );
-
+      
+      // atualização do estado global do usuário no contexto
+      setUser({
+        ...user, //faz um spread do objeto atual do usuário, copiando todas as propriedades que existem do user (emial, id, senha etc.)
+        username: username.trim()  || user.username, //se o campo estiver vazio, mantém o valor antigo, senão atualiza e o trim remove espaços vazios desnecessários
+        email: email.trim() || user.email,
+        profile_picture_url: finalProfilePictureUrl || user.profile_picture_url,
+      });
+      
       Alert.alert('Sucesso', response.data.message);
       navigation.goBack();
+
 
     } catch (error) {
       console.error('Erro ao atualizar perfil:', error.response?.data || error.message);

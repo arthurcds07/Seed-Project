@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker'; 
 import DrawerMenu from '../components/DrawerMenu';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 
 const SocialScreen = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
@@ -21,36 +22,33 @@ const SocialScreen = ({ navigation }) => {
   const [userLikes, setUserLikes] = useState({});
   const [currentUserId, setCurrentUserId] = useState(null);
   const [newPostImageUri, setNewPostImageUri] = useState(null); 
-  const [user, setUser] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const { user, setUser } = useContext(AuthContext);
 
-  
-  useEffect(() => {
-    const loadUserIdAndData = async () => {
-      try {
-        const userDataString = await AsyncStorage.getItem('userData');
-        console.log(userDataString);
-        let userData = null;
-        if (userDataString) {
-          
-          userData = JSON.parse(userDataString);
-          console.log('Dados do usuário carregados:', userData);
-          setCurrentUserId(userData.id);
-        }
-        // Buscar dados completos do usuário logado
+useEffect(() => {
+  const loadUserIdAndData = async () => {
+    try {
+      const userDataString = await AsyncStorage.getItem('userData');
+      if (userDataString) {
+        const userData = JSON.parse(userDataString);
+        setCurrentUserId(userData.id);
+
         const userToken = await AsyncStorage.getItem('userToken');
         if (userToken) {
           const userResponse = await axios.get(`${API_ENDPOINTS.GETUSER}/${userData.id}`, {
             headers: { Authorization: `Bearer ${userToken}` }
           });
+          // Atualiza o contexto global
           setUser(userResponse.data.data);
         }
-      } catch (error) {
-        console.error('Erro ao carregar dados do usuário:', error);
       }
-    };
-    loadUserIdAndData();
-    fetchPosts();
+    } catch (error) {
+      console.error('Erro ao carregar dados do usuário:', error);
+    }
+  };
+
+  loadUserIdAndData();
+  fetchPosts();
 
     // Pedir permissão para acessar a galeria de imagens
     (async () => {
@@ -278,6 +276,7 @@ return (
     <DrawerMenu />
       <View style={styles.headerButtons}>
         <TouchableOpacity onPress={() => navigation.navigate('EditProfile')} style={styles.profileButton}>
+
           {user?.profile_picture_url ? (
             <Image
               source={{ uri: `${API_ENDPOINTS}/${user.profile_picture_url}` }}

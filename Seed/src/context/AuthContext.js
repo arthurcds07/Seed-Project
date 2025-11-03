@@ -28,6 +28,7 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     try {
       await AsyncStorage.removeItem('userToken');
+      await AsyncStorage.removeItem('userData');
       setUserToken(null);
       setUser(null);
     } catch (e) {
@@ -39,13 +40,18 @@ export const AuthProvider = ({ children }) => {
     const loadToken = async () => {
       try {
         const token = await AsyncStorage.getItem('userToken');
+        const userDataString = await AsyncStorage.getItem('userData');
+
         if (token) {
           setUserToken(token);
         } else {
           setUserToken(null);
         }
+         if (userDataString) {
+        setUser(JSON.parse(userDataString));
+      }
       } catch (e) {
-        console.error('Failed to load token', e);
+        console.error('Falha ao carregar o token ou usuário', e);
       } finally {
         setLoading(false);
       }
@@ -55,7 +61,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ userToken, user, signIn, signOut, loading }}>
+    <AuthContext.Provider value={{ userToken, user, setUser, signIn, signOut, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -46,6 +46,8 @@ const createUser = async (req, res) => {
 // ------------------------------- Edit User -------------------------------
 
 const updateUser = (req, res) => {
+  
+  console.log("Dados recebidos no update:", req.body);
 
   const userEmail = req.body.email
   const userPassword = req.body.password
@@ -54,14 +56,14 @@ const updateUser = (req, res) => {
 
   const userId = req.params.id;
 
-  if (!userEmail && !userPassword && !userName) {
+  if (!userEmail && !userPassword && !userName && !profilePicture_url) {
     return res.status(400).json({
       success: false,
       message: "Preencha ao menos um campo para atualizar!",
     });
   }
 
-  const fields = []
+  const fields = [] 
   const values = []
 
   if (userEmail) {
@@ -70,8 +72,9 @@ const updateUser = (req, res) => {
   };
 
   if (userPassword) {
+    const hashedPassword = bcrypt.hashSync(userPassword, 10);
     fields.push("password = ?")
-    values.push(userPassword)
+    values.push(hashedPassword)
   };
 
   if (userName) {
@@ -79,9 +82,9 @@ const updateUser = (req, res) => {
     values.push(userName)
   };
 
-  if (profilePicture) {
-    fields.push("profile_picture = ?")
-    values.push(profilePicture)
+  if (profilePicture_url) {
+    fields.push("profile_picture_url = ?")
+    values.push(profilePicture_url)
   };
 
 
