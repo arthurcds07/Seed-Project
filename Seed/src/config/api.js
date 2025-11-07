@@ -5,7 +5,7 @@ import axios from 'axios';
 // const rota = 'http://localhost:3003/api';
 
 // Celular
-const rota = 'http://192.168.1.10:3003/api';
+const rota = 'http://172.20.91.49:3003/api';
 
 // Instância do axios
 const api = axios.create({
@@ -14,7 +14,7 @@ const api = axios.create({
 });
 
 export const API_ENDPOINTS = {
-  LOGIN: `http://192.168.1.10:3003/auth/login`, 
+  LOGIN: `http://172.20.91.49:3003/auth/login`, 
   REGISTER: `${rota}/user/create`, 
   GETUSER: `${rota}/user`,
   FOODS: `${rota}/foods`,

@@ -214,10 +214,10 @@ const EditProfileScreen = ({ route, navigation }) => {
           secureTextEntry
         />
 
-        <TouchableOpacity onPress={handleUpdateProfile} disabled={isSubmitting} style={{ width: '100%', marginTop: 10 }}>
-          <View style={{ backgroundColor: isSubmitting ? '#ccc' : '#4EA12C', padding: 15, borderRadius: 8, alignItems: 'center' }}>
-            <Text style={{ color: '#fff', fontSize: 16 }}>{isSubmitting ? "Salvando..." : "Salvar Alterações"}</Text>
-          </View>
+        <TouchableOpacity onPress={handleUpdateProfile} disabled={isSubmitting} style={styles.saveButton}>
+          <Text style={styles.saveButtonText}>
+            {isSubmitting ? "Salvando..." : "Salvar Alterações"}
+          </Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -227,26 +227,26 @@ const EditProfileScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E1FAD8',
+    backgroundColor: '#fff',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 15,
-    paddingVertical: 10,
+    paddingTop: 50,
+    paddingBottom: 15,
     backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    paddingTop: 40,
+    elevation: 0,
+    shadowOpacity: 0,
   },
   backButton: {
     padding: 5,
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#222',
   },
   scrollViewContent: {
     padding: 20,
@@ -255,45 +255,59 @@ const styles = StyleSheet.create({
   profilePictureContainer: {
     alignItems: 'center',
     marginBottom: 20,
+    position: 'relative',
   },
   profilePicture: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 2,
-    borderColor: '#8CEB66',
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: '#f0f0f0',
   },
   profilePicturePlaceholder: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
     backgroundColor: '#e0e0e0',
     justifyContent: 'center',
     alignItems: 'center',
   },
   changePhotoText: {
-    marginTop: 10,
-    color: '#007bff',
-    textDecorationLine: 'underline',
+    marginTop: 8,
+    fontSize: 14,
+    color: '#888',
   },
   input: {
     width: '100%',
-    padding: 15,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    marginBottom: 15,
-    backgroundColor: '#fff',
-    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderRadius: 12,
+    backgroundColor: '#f5f5f5',
+    marginBottom: 12,
+    fontSize: 15,
+    color: '#333',
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginTop: 20,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#666',
+    marginTop: 25,
     marginBottom: 10,
     alignSelf: 'flex-start',
     width: '100%',
+  },
+  saveButton: {
+    backgroundColor: '#4EA12C',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 20,
+    width: '100%',
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 1,
   },
 });
 
