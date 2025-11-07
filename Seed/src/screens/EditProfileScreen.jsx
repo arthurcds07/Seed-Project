@@ -26,6 +26,9 @@ const EditProfileScreen = ({ route, navigation }) => {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [selectedImageUri, setSelectedImageUri] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [deletePassword, setDeletePassword] = useState('');
+
 
   useEffect(() => {
     (async () => {
@@ -155,6 +158,40 @@ const EditProfileScreen = ({ route, navigation }) => {
     }
   };
 
+    const handleDeleteAccount = async () => {
+      if (!deletePassword.trim()) {
+        Alert.alert('Erro', 'Digite sua senha para confirmar.');
+        return;
+      }
+    
+      try {
+        const userToken = await AsyncStorage.getItem('userToken');
+        if (!userToken) {
+          Alert.alert('Erro de autenticação', 'Você não está logado.');
+          signOut();
+          return;
+        }
+    
+        const response = await axios.delete(
+          API_ENDPOINTS.DELETE_USER(user.id),
+          {
+            headers: { Authorization: `Bearer ${userToken}` },
+            data: { password: deletePassword }, // se seu backend exige senha
+          }
+        );
+    
+        Alert.alert('Conta excluída', response.data.message || 'Sua conta foi excluída com sucesso.');
+        signOut(); // remove token e redireciona
+      } catch (error) {
+        console.error('Erro ao excluir conta:', error.response?.data || error.message);
+        Alert.alert('Erro', error.response?.data?.message || 'Não foi possível excluir a conta.');
+      } finally {
+        setDeleteModalVisible(false);
+        setDeletePassword('');
+      }
+    };
+    
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -219,7 +256,49 @@ const EditProfileScreen = ({ route, navigation }) => {
             {isSubmitting ? "Salvando..." : "Salvar Alterações"}
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity onPress={() => setDeleteModalVisible(true)} style={{ marginTop: 10 }}>
+          <View style={{ backgroundColor: '#ff4d4d', padding: 14, borderRadius: 12, alignItems: 'center' }}>
+            <Text style={{ color: '#fff', fontSize: 15, fontWeight: '600' }}>Excluir Conta</Text>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
+
+  {deleteModalVisible && (
+  <View style={{
+    position: 'absolute',
+    top: 0, left: 0, right: 0, bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  }}>
+    <View style={{
+      backgroundColor: '#fff',
+      borderRadius: 12,
+      padding: 20,
+      width: '100%',
+      maxWidth: 350,
+    }}>
+      <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>Confirmar Exclusão</Text>
+      <Text style={{ marginBottom: 15 }}>Digite sua senha para confirmar a exclusão da conta:</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Senha"
+        secureTextEntry
+        value={deletePassword}
+        onChangeText={setDeletePassword}
+      />
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
+        <TouchableOpacity onPress={() => setDeleteModalVisible(false)} style={{ padding: 10 }}>
+          <Text style={{ color: '#007bff' }}>Cancelar</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleDeleteAccount} style={{ padding: 10 }}>
+          <Text style={{ color: '#ff4d4d', fontWeight: 'bold' }}>Excluir</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+)}
     </View>
   );
 }

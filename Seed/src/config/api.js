@@ -21,6 +21,7 @@ export const API_ENDPOINTS = {
   MEALS: `${rota}/meals`,
   POSTS: `${rota}/posts`,
   UPDATE_USER: (userId) => `${rota}/user/update/${userId}`,
+  DELETE_USER: (userId) => `${rota}/user/delete/${userId}`,
   USER_LIKES: (userId) => `${rota}/users/${userId}/likes`,
   USER_FAVORITES: (userId) => `${rota}/users/${userId}/favorites`,
   POST_LIKE: (postId) => `${rota}/posts/${postId}/like`,
