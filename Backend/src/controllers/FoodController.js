@@ -31,7 +31,7 @@ const getAllFoods = (req, res) => {
 
 const getFoodById = async (req, res) => {
   const { id } = req.params;
-  
+
   const query = `
     SELECT 
       id,
@@ -47,19 +47,19 @@ const getFoodById = async (req, res) => {
 
   connection.query(query, [id], (err, results) => {
     if (err) {
-      return res.status(500).json({ 
+      return res.status(500).json({
         success: false,
-        message: "Erro no banco de dados" 
+        message: "Erro no banco de dados"
       });
     }
-    
+
     if (results.length === 0) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: "Alimento não encontrado" 
+        message: "Alimento não encontrado"
       });
     }
-    
+
     res.status(200).json({
       success: true,
       data: results[0]
@@ -74,32 +74,34 @@ const searchFoods = (req, res) => {
   }
 
   const query = `
-    SELECT 
-      id,
-      nome,
-      porcao as portion,
-      calorias,
-      proteina as protein,
-      carboidrato as carbs,
-      gordura as fat
-    FROM Alimentos
-    WHERE nome LIKE ?
-    ORDER BY nome
-  `;
+  SELECT 
+    id,
+    nome,
+    unidade_medida,
+    calorias,
+    proteina,
+    carboidrato,
+    gordura
+  FROM Alimentos
+  WHERE nome LIKE ?
+  ORDER BY nome
+`;
+
 
   connection.query(query, [`%${q}%`], (err, results) => {
     if (err) {
-      console.error('Erro no banco:', err);
-      return res.status(500).json({ success: false, message: "Erro no servidor" });
+      console.error('Erro no banco ao buscar por nome:', err.sqlMessage || err.message);
+      return res.status(500).json({ success: false, message: "Erro no servidor", error: err.message });
     }
     res.status(200).json({ success: true, data: results });
   });
 };
 
 
+
 //para aparecer a caixa de refeição de acordo com o usuario logado
 const getUserMeals = (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
 
   const query = `SELECT * FROM Refeicoes WHERE id_usuario = ?`;
 
@@ -119,7 +121,7 @@ const getUserMeals = (req, res) => {
 }
 
 const getMealFoods = (req, res) => {
-  const {id} = req.params;
+  const { id } = req.params;
 
   const query = 'SELECT * FROM AlimentosRefeicoes WHERE id_refeicao = ?';
 
@@ -139,7 +141,7 @@ const getMealFoods = (req, res) => {
 }
 
 const createMeal = (req, res) => {
-  const {id_usuario, nome} = req.body;
+  const { id_usuario, nome } = req.body;
 
   const query = 'INSERT INTO Refeicoes (id_usuario, nome) VALUES (?, ?)';
 
@@ -160,7 +162,7 @@ const createMeal = (req, res) => {
 }
 
 const createFood = (req, res) => {
-  const {id_alimento, id_refeicao, quantidade} = req.body;
+  const { id_alimento, id_refeicao, quantidade } = req.body;
 
   const query = 'INSERT INTO AlimentosRefeicoes (id_alimento, id_refeicao, quantidade) VALUES (?, ?, ?)';
 

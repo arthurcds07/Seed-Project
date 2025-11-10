@@ -21,7 +21,7 @@ export default function AppStack() {
      }}
      > 
       <Stack.Screen name="Home" component={HomeScreen} />
-      <Stack.Screen name="Diet" component={DietScreen} />
+      <Drawer.Screen name="Diet" component={DietScreen} />
       <Stack.Screen name="Social" component={SocialScreen} />
       <Stack.Screen name="PostDetail" component={PostDetailScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
