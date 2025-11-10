@@ -67,6 +67,36 @@ const getFoodById = async (req, res) => {
   });
 };
 
+const searchFoods = (req, res) => {
+  const { q } = req.query;
+  if (!q || q.trim().length < 2) {
+    return res.status(400).json({ success: false, message: "Termo de busca inválido" });
+  }
+
+  const query = `
+    SELECT 
+      id,
+      nome,
+      porcao as portion,
+      calorias,
+      proteina as protein,
+      carboidrato as carbs,
+      gordura as fat
+    FROM Alimentos
+    WHERE nome LIKE ?
+    ORDER BY nome
+  `;
+
+  connection.query(query, [`%${q}%`], (err, results) => {
+    if (err) {
+      console.error('Erro no banco:', err);
+      return res.status(500).json({ success: false, message: "Erro no servidor" });
+    }
+    res.status(200).json({ success: true, data: results });
+  });
+};
+
+
 //para aparecer a caixa de refeição de acordo com o usuario logado
 const getUserMeals = (req, res) => {
   const {id} = req.params;
@@ -152,9 +182,10 @@ const createFood = (req, res) => {
 
 module.exports = {
   getAllFoods,
-  getFoodById,
+  searchFoods,
   getUserMeals,
   getMealFoods,
   createMeal,
-  createFood
+  createFood,
+  getFoodById
 };

@@ -149,17 +149,16 @@ const viewUser = (req, res) => {
 // ------------------------------- Delete User -------------------------------
 
 const deleteUser = (req, res) => {
-  const userId = Number(req.params.id);
 
+  const userId = Number(req.params.id);
   if (!Number.isInteger(userId) || userId <= 0) {
     return res.status(400).json({
       message: "Insira um valor de ID válido!",
       success: false
     });
   }
-
+ 
   const query = `DELETE FROM User WHERE id = ?`;
-
   connection.query(query, [userId], (err, result) => {
     if (err) {
       return res.status(500).json({
@@ -167,24 +166,17 @@ const deleteUser = (req, res) => {
         success: false
       });
     }
-
-    if (result.length === 0) {
+    if (result.affectedRows === 0) {
       return res.status(404).json({
         success: false,
         message: "Usuário não encontrado"
       });
     }
-
+ 
     return res.status(200).json({
       message: "Sucesso ao deletar usuário",
-      success: true,
-      data: result[0] // retorna apenas o usuário encontrado
+      success: true
     });
-  });
-    return res.status(200).json({
-    message: "Sucesso ao deletar usuário",
-    success: true,
-    data: result[0] // retorna apenas o usuário encontrado
   });
 };
 
