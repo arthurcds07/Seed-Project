@@ -5,11 +5,11 @@ const getAllFoods = (req, res) => {
     SELECT 
       id,
       nome,
-      porcao as portion,
+      unidade_medida,
       calorias,
-      proteina as protein,
-      carboidrato as carbs,
-      gordura as fat
+      proteina ,
+      carboidrato,
+      gordura
     FROM Alimentos
     ORDER BY nome
   `;
@@ -36,12 +36,12 @@ const getFoodById = async (req, res) => {
     SELECT 
       id,
       nome,
-      porcao as portion,
+      unidade_medida,
       calorias,
-      proteina as protein,
-      carboidrato as carbs,
-      gordura as fat
-    FROM Alimentos 
+      proteina ,
+      carboidrato,
+      gordura
+    FROM Alimentos
     WHERE id = ?
   `;
 
@@ -103,7 +103,7 @@ const searchFoods = (req, res) => {
 const getUserMeals = (req, res) => {
   const { id } = req.params;
 
-  const query = `SELECT * FROM Refeicoes WHERE id_usuario = ?`;
+  const query = `SELECT * FROM Refeicoes WHERE id_user = ?`;
 
   connection.query(query, [id], (err, results) => {
     if (err) {
@@ -141,11 +141,11 @@ const getMealFoods = (req, res) => {
 }
 
 const createMeal = (req, res) => {
-  const { id_usuario, nome } = req.body;
+  const { id_user, nome } = req.body;
 
-  const query = 'INSERT INTO Refeicoes (id_usuario, nome) VALUES (?, ?)';
+  const query = 'INSERT INTO Refeicoes (id_user, nome) VALUES (?, ?)';
 
-  connection.query(query, [id_usuario, nome], (err, result) => {
+  connection.query(query, [id_user, nome], (err, result) => {
     if (err) {
       console.error('Erro no banco:', err);
       return res.status(500).json({
