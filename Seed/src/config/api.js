@@ -19,6 +19,7 @@ export const API_ENDPOINTS = {
   GETUSER: `${rota}/user`,
   FOODS: `${rota}/foods`,
   MEALS: `${rota}/meals`,
+  DELETE_MEAL: (mealId) => `${rota}/foods/meal/${mealId}`,
   POSTS: `${rota}/posts`,
   UPDATE_USER: (userId) => `${rota}/user/update/${userId}`,
   DELETE_USER: (userId) => `${rota}/user/delete/${userId}`,

@@ -123,7 +123,22 @@ const getUserMeals = (req, res) => {
 const getMealFoods = (req, res) => {
   const { id } = req.params;
 
-  const query = 'SELECT * FROM AlimentosRefeicoes WHERE id_refeicao = ?';
+  const query = `
+    SELECT 
+      ar.id,
+      ar.id_refeicao,
+      ar.quantidade,
+      a.id AS id_alimento,
+      a.nome,
+      a.unidade_medida,
+      a.calorias,
+      a.proteina,
+      a.carboidrato,
+      a.gordura
+    FROM AlimentosRefeicoes ar
+    JOIN Alimentos a ON ar.id_alimento = a.id
+    WHERE ar.id_refeicao = ?
+  `;
 
   connection.query(query, [id], (err, results) => {
     if (err) {
@@ -138,7 +153,8 @@ const getMealFoods = (req, res) => {
       data: results
     });
   });
-}
+};
+
 
 const createMeal = (req, res) => {
   const { id_user, nome } = req.body;
@@ -182,6 +198,36 @@ const createFood = (req, res) => {
   });
 }
 
+
+const deleteMeal = (req, res) => {
+  const { id } = req.params;
+
+  const query = 'DELETE FROM Refeicoes WHERE id = ?';
+
+  connection.query(query, [id], (err, result) => {
+    if (err) {
+      console.error('Erro ao excluir refeição:', err);
+      return res.status(500).json({
+        success: false,
+        message: "Erro ao excluir refeição"
+      });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Refeição não encontrada"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Refeição excluída com sucesso"
+    });
+  });
+};
+
+
 module.exports = {
   getAllFoods,
   searchFoods,
@@ -189,5 +235,6 @@ module.exports = {
   getMealFoods,
   createMeal,
   createFood,
-  getFoodById
+  getFoodById,
+  deleteMeal
 };

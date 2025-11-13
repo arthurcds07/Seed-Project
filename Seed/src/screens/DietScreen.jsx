@@ -1,10 +1,9 @@
 import React, { useContext, useState, useEffect } from 'react';
 import {
-  View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView
+  View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView, Image
 } from 'react-native';
 import { useDiet } from '../context/DietContext';
 import { AuthContext } from '../context/AuthContext';
-import PieChart from 'react-native-pie-chart';
 import { API_ENDPOINTS } from '../config/api';
 
 const DietScreen = () => {
@@ -16,17 +15,6 @@ const DietScreen = () => {
   const [newMealName, setNewMealName] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState([]);
-
-  // 📊 Calcular totais diários
-  const dailyTotals = meals.reduce((acc, meal) => {
-    acc.calories += meal.totals.calories;
-    acc.protein += meal.totals.protein;
-    acc.carbs += meal.totals.carbs;
-    acc.fat += meal.totals.fat;
-    return acc;
-  }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
-
-  const totalMacros = dailyTotals.carbs + dailyTotals.protein + dailyTotals.fat;
 
   // 🔍 Buscar sugestões de alimentos por nome
   useEffect(() => {
@@ -58,28 +46,16 @@ const DietScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* 🔵 Gráfico de macros */}
-      {totalMacros > 0 ? (
-        <View style={styles.chartContainer}>
-          <PieChart
-            widthAndHeight={160}
-            series={[dailyTotals.carbs, dailyTotals.protein, dailyTotals.fat]}
-            sliceColor={['#F7C59F', '#A0CED9', '#F48484']}
-            coverRadius={0.6}
-            coverFill={'#FFF'}
-          />
-          <Text style={styles.caloriesText}>{dailyTotals.calories} kcal</Text>
-          <Text style={styles.macrosLabel}>
-            C: {dailyTotals.carbs}g • P: {dailyTotals.protein}g • G: {dailyTotals.fat}g
-          </Text>
-        </View>
-      ) : (
-        <View style={styles.chartContainer}>
-          <Text style={{ fontSize: 16, color: '#666' }}>Adicione alimentos para visualizar o gráfico</Text>
-        </View>
-      )}
+      {/* foto de perfil */}
+      <View style={styles.profileContainer}>
+        <Image
+          source={{ uri: user?.profilePicture || 'https://via.placeholder.com/150' }}
+          style={styles.profileImage}
+        />
+        <Text style={styles.profileName}>{user?.name || 'Usuário'}</Text>
+      </View>
 
-      {/* 🥗 Refeições */}
+      {/* refeições */}
       {meals.map(meal => (
         <View key={meal.id} style={styles.mealCard}>
           {editingMeal === meal.id ? (
@@ -98,7 +74,7 @@ const DietScreen = () => {
             <Text style={styles.mealTitle}>{meal.name}</Text>
           )}
 
-          {/* 🍽️ Alimentos da refeição */}
+          {/* alimentos da refeição */}
           {meal.foods.map((food, index) => (
             <View key={index} style={styles.foodItem}>
               <Text style={styles.foodText}>{food.nome}</Text>
@@ -108,12 +84,16 @@ const DietScreen = () => {
             </View>
           ))}
 
-          {/* 📊 Totais da refeição */}
-          <Text style={styles.totalsText}>
-            TOTAL: {meal.totals.calories}kcal • P: {meal.totals.protein}g • C: {meal.totals.carbs}g • G: {meal.totals.fat}g
-          </Text>
+          {/* totais da refeição */}
+          <View style={styles.totalsBlock}>
+            <Text style={styles.totalsTitle}>Total da refeição:</Text>
+            <Text style={styles.totalsLine}>Calorias: {meal.totals.calories} kcal</Text>
+            <Text style={styles.totalsLine}>Proteína: {meal.totals.protein} g</Text>
+            <Text style={styles.totalsLine}>Carboidrato: {meal.totals.carbs} g</Text>
+            <Text style={styles.totalsLine}>Gordura: {meal.totals.fat} g</Text>
+          </View>
 
-          {/* 🔍 Campo de busca de alimentos */}
+          {/* cmpo de busca de alimentos */}
           {selectedMeal === meal.id && (
             <View style={styles.searchContainer}>
               <TextInput
@@ -173,20 +153,20 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#F5FFF0',
   },
-  chartContainer: {
+  profileContainer: {
     alignItems: 'center',
     marginBottom: 24,
   },
-  caloriesText: {
-    position: 'absolute',
-    top: 65,
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 12,
+  },
+  profileName: {
     fontSize: 18,
     fontWeight: 'bold',
-  },
-  macrosLabel: {
-    marginTop: 8,
-    fontSize: 14,
-    color: '#555',
+    color: '#333',
   },
   mealCard: {
     backgroundColor: '#fff',
@@ -209,11 +189,6 @@ const styles = StyleSheet.create({
   foodMacros: {
     fontSize: 14,
     color: '#666',
-  },
-  totalsText: {
-    marginTop: 8,
-    fontWeight: 'bold',
-    color: '#333',
   },
   searchContainer: {
     marginTop: 12,
@@ -272,6 +247,20 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 20,
+  },
+  totalsBlock: {
+    marginTop: 10,
+    backgroundColor: '#F0F0F0',
+    padding: 10,
+    borderRadius: 8,
+  },
+  totalsTitle: {
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  totalsLine: {
+    fontSize: 14,
+    color: '#333',
   },
   buttonText: {
     color: '#fff',
