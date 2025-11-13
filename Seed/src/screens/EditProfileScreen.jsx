@@ -40,7 +40,6 @@ const EditProfileScreen = ({ route, navigation }) => {
       }
     })();
   }, []);
-
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -72,6 +71,7 @@ const EditProfileScreen = ({ route, navigation }) => {
 
       let finalProfilePictureUrl = profilePictureUrl;
       if (selectedImageUri) {
+
         const formData = new FormData();
         const filename = selectedImageUri.split('/').pop();
         const match = /\.(\w+)$/.exec(filename);
@@ -89,16 +89,19 @@ const EditProfileScreen = ({ route, navigation }) => {
             type: type,
           });
         }
-
+        
+        
         try {
-          console.log("Enviando updateData:", filteredUpdateData);
+          console.log("Token usado no upload:", userToken);
+          const uploadResponse = await axios.post(
+            API_ENDPOINTS.UPLOAD_PROFILE_PICTURE,
+            formData,
+            {
+              headers: { Authorization: `Bearer ${userToken}` },
+            }
+          );
 
-          const uploadResponse = await axios.post('/upload/profile-picture', formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              'Authorization': `Bearer ${userToken}`,
-            },
-          });
+
           finalProfilePictureUrl = uploadResponse.data.imageUrl;
         } catch (uploadError) {
           console.error('Erro ao fazer upload da imagem de perfil:', uploadError.response?.data || uploadError.message);
@@ -134,15 +137,15 @@ const EditProfileScreen = ({ route, navigation }) => {
         filteredUpdateData,
         { headers: { Authorization: `Bearer ${userToken}` } }
       );
-      
+
       // atualização do estado global do usuário no contexto
       setUser({
         ...user, //faz um spread do objeto atual do usuário, copiando todas as propriedades que existem do user (emial, id, senha etc.)
-        username: username.trim()  || user.username, //se o campo estiver vazio, mantém o valor antigo, senão atualiza e o trim remove espaços vazios desnecessários
+        username: username.trim() || user.username, //se o campo estiver vazio, mantém o valor antigo, senão atualiza e o trim remove espaços vazios desnecessários
         email: email.trim() || user.email,
         profile_picture_url: finalProfilePictureUrl || user.profile_picture_url,
       });
-      
+
       Alert.alert('Sucesso', response.data.message);
       navigation.goBack();
 
@@ -158,39 +161,39 @@ const EditProfileScreen = ({ route, navigation }) => {
     }
   };
 
-    const handleDeleteAccount = async () => {
-      if (!deletePassword.trim()) {
-        Alert.alert('Erro', 'Digite sua senha para confirmar.');
+  const handleDeleteAccount = async () => {
+    if (!deletePassword.trim()) {
+      Alert.alert('Erro', 'Digite sua senha para confirmar.');
+      return;
+    }
+
+    try {
+      const userToken = await AsyncStorage.getItem('userToken');
+      if (!userToken) {
+        Alert.alert('Erro de autenticação', 'Você não está logado.');
+        signOut();
         return;
       }
-    
-      try {
-        const userToken = await AsyncStorage.getItem('userToken');
-        if (!userToken) {
-          Alert.alert('Erro de autenticação', 'Você não está logado.');
-          signOut();
-          return;
+
+      const response = await axios.delete(
+        API_ENDPOINTS.DELETE_USER(user.id),
+        {
+          headers: { Authorization: `Bearer ${userToken}` },
+          data: { password: deletePassword }, // se seu backend exige senha
         }
-    
-        const response = await axios.delete(
-          API_ENDPOINTS.DELETE_USER(user.id),
-          {
-            headers: { Authorization: `Bearer ${userToken}` },
-            data: { password: deletePassword }, // se seu backend exige senha
-          }
-        );
-    
-        Alert.alert('Conta excluída', response.data.message || 'Sua conta foi excluída com sucesso.');
-        signOut(); // remove token e redireciona
-      } catch (error) {
-        console.error('Erro ao excluir conta:', error.response?.data || error.message);
-        Alert.alert('Erro', error.response?.data?.message || 'Não foi possível excluir a conta.');
-      } finally {
-        setDeleteModalVisible(false);
-        setDeletePassword('');
-      }
-    };
-    
+      );
+
+      Alert.alert('Conta excluída', response.data.message || 'Sua conta foi excluída com sucesso.');
+      signOut(); // remove token e redireciona
+    } catch (error) {
+      console.error('Erro ao excluir conta:', error.response?.data || error.message);
+      Alert.alert('Erro', error.response?.data?.message || 'Não foi possível excluir a conta.');
+    } finally {
+      setDeleteModalVisible(false);
+      setDeletePassword('');
+    }
+  };
+
 
   return (
     <View style={styles.container}>
@@ -263,42 +266,42 @@ const EditProfileScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       </ScrollView>
 
-  {deleteModalVisible && (
-  <View style={{
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  }}>
-    <View style={{
-      backgroundColor: '#fff',
-      borderRadius: 12,
-      padding: 20,
-      width: '100%',
-      maxWidth: 350,
-    }}>
-      <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>Confirmar Exclusão</Text>
-      <Text style={{ marginBottom: 15 }}>Digite sua senha para confirmar a exclusão da conta:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        secureTextEntry
-        value={deletePassword}
-        onChangeText={setDeletePassword}
-      />
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
-        <TouchableOpacity onPress={() => setDeleteModalVisible(false)} style={{ padding: 10 }}>
-          <Text style={{ color: '#007bff' }}>Cancelar</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleDeleteAccount} style={{ padding: 10 }}>
-          <Text style={{ color: '#ff4d4d', fontWeight: 'bold' }}>Excluir</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-)}
+      {deleteModalVisible && (
+        <View style={{
+          position: 'absolute',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 20,
+        }}>
+          <View style={{
+            backgroundColor: '#fff',
+            borderRadius: 12,
+            padding: 20,
+            width: '100%',
+            maxWidth: 350,
+          }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 10 }}>Confirmar Exclusão</Text>
+            <Text style={{ marginBottom: 15 }}>Digite sua senha para confirmar a exclusão da conta:</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Senha"
+              secureTextEntry
+              value={deletePassword}
+              onChangeText={setDeletePassword}
+            />
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
+              <TouchableOpacity onPress={() => setDeleteModalVisible(false)} style={{ padding: 10 }}>
+                <Text style={{ color: '#007bff' }}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleDeleteAccount} style={{ padding: 10 }}>
+                <Text style={{ color: '#ff4d4d', fontWeight: 'bold' }}>Excluir</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   );
 }

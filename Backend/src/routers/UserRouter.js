@@ -1,15 +1,16 @@
-//Calling Express dependencies 
-const express = require('express')
-const router = express.Router()//Express Router dependency responsible for handling all routes
+const express = require('express');
+const router = express.Router();
 
 const UserController = require('../controllers/UserController');
+const { uploadProfilePicture, handleProfilePictureUpload } = require('../controllers/UploadController');
+const { verifyToken } = require('../middlewares/authMiddleware');
 
-router.post('/create',  UserController.createUser)
-router.get('/:id', UserController.viewUser)
-router.put('/update/:id', UserController.updateUser)
-router.delete('/delete/:id', UserController.deleteUser)
+// Rotas de usuário
+router.post('/create', UserController.createUser);
+router.get('/:id', UserController.viewUser);
+router.put('/update/:id', UserController.updateUser);
+router.delete('/delete/:id', UserController.deleteUser);
 
-//Exporting variable "router" with module.exports using require()
-module.exports = router
+// Rota de upload da foto de perfil
 
-//http://localhost:3003/api/user/create
+module.exports = router;
