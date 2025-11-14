@@ -97,10 +97,12 @@ const EditProfileScreen = ({ route, navigation }) => {
             API_ENDPOINTS.UPLOAD_PROFILE_PICTURE,
             formData,
             {
-              headers: { Authorization: `Bearer ${userToken}` },
+              headers: {
+                 Authorization: `Bearer ${userToken}`,
+                 'Content-Type': 'multipart/form-data',
+                },
             }
           );
-
 
           finalProfilePictureUrl = uploadResponse.data.imageUrl;
         } catch (uploadError) {

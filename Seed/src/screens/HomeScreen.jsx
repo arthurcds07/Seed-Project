@@ -11,7 +11,7 @@ import { AuthContext } from "../context/AuthContext";
 import DrawerMenu from "../components/DrawerMenu";
 
 const HomeScreen = ({ navigation }) => {
-    const { signOut } = useContext(AuthContext);
+    // const { signOut } = useContext(AuthContext); 
 
     const translateY = useSharedValue(0);
 

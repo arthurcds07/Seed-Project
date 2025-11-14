@@ -5,6 +5,8 @@ import {
 import { useDiet } from '../context/DietContext';
 import { AuthContext } from '../context/AuthContext';
 import { API_ENDPOINTS } from '../config/api';
+import DrawerMenu from "../components/DrawerMenu";
+
 
 const DietScreen = () => {
   const { meals, addMeal, updateMeal, deleteMeal, addFoodToMeal } = useDiet();
@@ -45,7 +47,9 @@ const DietScreen = () => {
   };
 
   return (
+    
     <ScrollView contentContainerStyle={styles.container}>
+      <DrawerMenu />  
       {/* foto de perfil */}
       <View style={styles.profileContainer}>
         <Image
