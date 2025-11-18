@@ -106,41 +106,9 @@ const toggleLike = (req, res) => {
   });
 };
 
-// Favoritar/desfavoritar post
-const toggleFavorite = (req, res) => {
-  const { postId } = req.params;
-  const userId = req.user.id;
 
-  const checkQuery = 'SELECT id FROM favorites WHERE post_id = ? AND user_id = ?';
-  connection.query(checkQuery, [postId, userId], (err, existingFavorite) => {
-    if (err) {
-      console.error('Erro ao verificar favorito:', err);
-      return res.status(500).json({ message: 'Erro interno do servidor ao favoritar/desfavoritar post.' });
-    }
 
-    if (existingFavorite.length > 0) {
-      const deleteQuery = 'DELETE FROM favorites WHERE id = ?';
-      connection.query(deleteQuery, [existingFavorite[0].id], (err) => {
-        if (err) {
-          console.error('Erro ao remover favorito:', err);
-          return res.status(500).json({ message: 'Erro interno ao remover favorito.' });
-        }
-        return res.status(200).json({ message: 'Favorito removido com sucesso.', favorited: false });
-      });
-    } else {
-      const insertQuery = 'INSERT INTO favorites (post_id, user_id) VALUES (?, ?)';
-      connection.query(insertQuery, [postId, userId], (err) => {
-        if (err) {
-          console.error('Erro ao adicionar favorito:', err);
-          return res.status(500).json({ message: 'Erro interno ao adicionar favorito.' });
-        }
-        return res.status(201).json({ message: 'Post adicionado aos favoritos.', favorited: true });
-      });
-    }
-  });
-};
-
-// Buscar posts com ou sem termo de pesquisa
+//Buscar posts com ou sem pesquisa
 const searchPosts = (req, res) => {
   const { q } = req.query;
   let query = `
@@ -170,11 +138,42 @@ const searchPosts = (req, res) => {
   });
 };
 
+//Excluir post
+const deletePost = (req, res) => {
+  const postId = req.params.id;
+  const userId = req.user?.id;
+
+  if (!userId) return res.status(401).json({ success: false, message: 'Não autorizado.' });
+
+  const qCheck = 'SELECT user_id FROM posts WHERE id = ?';
+  connection.query(qCheck, [postId], (err, rows) => {
+    if (err) {
+      console.error('Erro ao verificar post:', err);
+      return res.status(500).json({ success: false, message: 'Erro interno.' });
+    }
+    if (!rows.length) return res.status(404).json({ success: false, message: 'Post não encontrado.' });
+
+    const ownerId = rows[0].user_id;
+    if (ownerId !== userId) {
+      return res.status(403).json({ success: false, message: 'Você não tem permissão para excluir este post.' });
+    }
+
+    const qDelete = 'DELETE FROM posts WHERE id = ?';
+    connection.query(qDelete, [postId], (err2) => {
+      if (err2) {
+        console.error('Erro ao excluir post:', err2);
+        return res.status(500).json({ success: false, message: 'Erro ao excluir post.' });
+      }
+      return res.status(200).json({ success: true, message: 'Post excluído.' });
+    });
+  });
+};
+
 module.exports = {
   getAllPosts,
   createPost,
   getPostById,
   toggleLike,
-  toggleFavorite,
-  searchPosts
+  searchPosts,
+  deletePost
 };

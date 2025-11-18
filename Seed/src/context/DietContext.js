@@ -26,13 +26,35 @@ export const DietProvider = ({ children }) => {
               const foodsResponse = await fetch(`${API_ENDPOINTS.FOODS}/food/${meal.id}`);
               const foodsResult = await foodsResponse.json();
 
-              const foods = foodsResult.success ? foodsResult.data.map(food => ({
-                ...food,
-                calorias: (Number(food.calorias) * food.quantidade) / 100,
-                proteina: (Number(food.proteina) * food.quantidade) / 100,
-                carboidrato: (Number(food.carboidrato) * food.quantidade) / 100,
-                gordura: (Number(food.gordura) * food.quantidade) / 100
-              })) : [];
+              const foods = foodsResult.success ? foodsResult.data.map(food => {
+                // manter valores "base" por 100g para permitir recalculo
+                const base_calorias = Number(food.calorias || 0);
+                const base_proteina = Number(food.proteina || 0);
+                const base_carboidrato = Number(food.carboidrato || 0);
+                const base_gordura = Number(food.gordura || 0);
+                const quantidade = Number(food.quantidade) || 100;
+
+                const calorias = (base_calorias * quantidade) / 100;
+                const proteina = (base_proteina * quantidade) / 100;
+                const carboidrato = (base_carboidrato * quantidade) / 100;
+                const gordura = (base_gordura * quantidade) / 100;
+
+                return {
+                  id: food.id, // id da tabela AlimentosRefeicoes (ar.id)
+                  id_alimento: food.id_alimento,
+                  nome: food.nome,
+                  quantidade,
+                  base_calorias,
+                  base_proteina,
+                  base_carboidrato,
+                  base_gordura,
+                  calorias,
+                  proteina,
+                  carboidrato,
+                  gordura,
+                  unidade_medida: food.unidade_medida
+                };
+              }) : [];
 
               const totals = calculateTotals(foods);
 
@@ -110,16 +132,8 @@ export const DietProvider = ({ children }) => {
 
   const addFoodToMeal = async (mealId, foodId) => {
     try {
-      const response = await fetch(`${API_ENDPOINTS.FOODS}/${foodId}`);
-      const result = await response.json();
-      if (!result.success) throw new Error(result.message || "Erro ao buscar alimento");
-
-      const foodData = {
-        ...result.data,
-        quantidade: 100 // padrão
-      };
-
-      await fetch(`${API_ENDPOINTS.FOODS}/food`, {
+      // 1) cria o registro na tabela AlimentosRefeicoes para obter o id (foodMealId)
+      const createRes = await fetch(`${API_ENDPOINTS.FOODS}/food`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -128,6 +142,37 @@ export const DietProvider = ({ children }) => {
           quantidade: 100
         })
       });
+      const createResult = await createRes.json();
+      if (!createResult.success) throw new Error(createResult.message || "Erro ao adicionar alimento");
+
+      const foodMealId = createResult.foodMealId;
+
+      // 2) buscar dados base do alimento (por 100g)
+      const response = await fetch(`${API_ENDPOINTS.FOODS}/${foodId}`);
+      const result = await response.json();
+      if (!result.success) throw new Error(result.message || "Erro ao buscar alimento");
+
+      const base_calorias = Number(result.data.calorias || 0);
+      const base_proteina = Number(result.data.proteina || 0);
+      const base_carboidrato = Number(result.data.carboidrato || 0);
+      const base_gordura = Number(result.data.gordura || 0);
+      const quantidade = 100;
+
+      const foodData = {
+        id: foodMealId, // id da tabela AlimentosRefeicoes
+        id_alimento: foodId,
+        nome: result.data.nome,
+        quantidade,
+        base_calorias,
+        base_proteina,
+        base_carboidrato,
+        base_gordura,
+        calorias: (base_calorias * quantidade) / 100,
+        proteina: (base_proteina * quantidade) / 100,
+        carboidrato: (base_carboidrato * quantidade) / 100,
+        gordura: (base_gordura * quantidade) / 100,
+        unidade_medida: result.data.unidade_medida
+      };
 
       setMeals(meals.map(meal => {
         if (meal.id === mealId) {
@@ -143,14 +188,47 @@ export const DietProvider = ({ children }) => {
     }
   };
 
+  const updateFoodQuantity = async (mealId, foodMealId, newQuantity) => {
+    try {
+      const response = await fetch(`${API_ENDPOINTS.FOODS}/food/${foodMealId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantidade: Number(newQuantity) })
+      });
+      const result = await response.json();
+      if (!result.success) throw new Error(result.message || "Erro ao atualizar quantidade");
+
+      setMeals(meals.map(meal => {
+        if (meal.id === mealId) {
+          const updatedFoods = meal.foods.map(food => {
+            if (food.id === foodMealId) {
+              const quantidade = Number(newQuantity);
+              const calorias = (food.base_calorias * quantidade) / 100;
+              const proteina = (food.base_proteina * quantidade) / 100;
+              const carboidrato = (food.base_carboidrato * quantidade) / 100;
+              const gordura = (food.base_gordura * quantidade) / 100;
+              return { ...food, quantidade, calorias, proteina, carboidrato, gordura };
+            }
+            return food;
+          });
+          return { ...meal, foods: updatedFoods, totals: calculateTotals(updatedFoods) };
+        }
+        return meal;
+      }));
+    } catch (error) {
+      console.error("Erro ao atualizar quantidade:", error);
+      Alert.alert("Erro", `Não foi possível atualizar a quantidade: ${error.message}`);
+    }
+  };
+
   const calculateTotals = (foods) => {
-  return foods.reduce((totals, food) => ({
-    calories: totals.calories + (Number(food.calorias) || 0),
-    protein: totals.protein + (Number(food.proteina) || 0),
-    carbs: totals.carbs + (Number(food.carboidrato) || 0),
-    fat: totals.fat + (Number(food.gordura) || 0)
-  }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
-};
+    return foods.reduce((totals, food) => ({
+      calories: totals.calories + (Number(food.calorias) || 0),
+      protein: totals.protein + (Number(food.proteina) || 0),
+      carbs: totals.carbs + (Number(food.carboidrato) || 0),
+      fat: totals.fat + (Number(food.gordura) || 0)
+    }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
+  };
 
 
   return (
@@ -159,7 +237,8 @@ export const DietProvider = ({ children }) => {
       addMeal,
       updateMeal,
       deleteMeal,
-      addFoodToMeal
+      addFoodToMeal,
+      updateFoodQuantity // <-- exposto para UI
     }}>
       {children}
     </DietContext.Provider>

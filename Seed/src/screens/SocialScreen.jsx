@@ -25,30 +25,47 @@ const SocialScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { user, setUser } = useContext(AuthContext);
 
-useEffect(() => {
-  const loadUserIdAndData = async () => {
-    try {
-      const userDataString = await AsyncStorage.getItem('userData');
-      if (userDataString) {
-        const userData = JSON.parse(userDataString);
-        setCurrentUserId(userData.id);
+  // estado para confirmação de exclusão
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [postToDelete, setPostToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
+  // base para montar URIs de imagens quando o banco guarda caminhos relativos
+  const apiBase = API_ENDPOINTS?.GETUSER
+    ? API_ENDPOINTS.GETUSER.replace('/user', '')
+    : (API_ENDPOINTS?.BASE || API_ENDPOINTS?.ROTA || '');
 
-        const userToken = await AsyncStorage.getItem('userToken');
-        if (userToken) {
-          const userResponse = await axios.get(`${API_ENDPOINTS.GETUSER}/${userData.id}`, {
-            headers: { Authorization: `Bearer ${userToken}` }
-          });
-          // Atualiza o contexto global
-          setUser(userResponse.data.data);
-        }
-      }
-    } catch (error) {
-      console.error('Erro ao carregar dados do usuário:', error);
-    }
+  const getImageUri = (pathOrUrl) => {
+    if (!pathOrUrl) return null;
+    if (pathOrUrl.startsWith('http')) return pathOrUrl;
+    if (pathOrUrl.startsWith('/')) return `${apiBase}${pathOrUrl}`;
+    return `${apiBase}/${pathOrUrl}`;
   };
 
-  loadUserIdAndData();
-  fetchPosts();
+  useEffect(() => {
+    const loadUserIdAndData = async () => {
+      try {
+        const userDataString = await AsyncStorage.getItem('userData');
+        if (userDataString) {
+          const userData = JSON.parse(userDataString);
+          setCurrentUserId(userData.id);
+
+          const userToken = await AsyncStorage.getItem('userToken');
+          if (userToken) {
+            const userResponse = await axios.get(`${API_ENDPOINTS.GETUSER}/${userData.id}`, {
+              headers: { Authorization: `Bearer ${userToken}` }
+            });
+            // Atualiza o contexto global
+            setUser(userResponse.data.data);
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar dados do usuário:', error);
+      }
+    };
+
+    loadUserIdAndData();
+    fetchPosts();
 
     // Pedir permissão para acessar a galeria de imagens
     (async () => {
@@ -59,6 +76,14 @@ useEffect(() => {
     })();
   }, [searchTerm, currentUserId]);
 
+  // Recarrega lista de posts quando a tela Social ganha foco (ex.: voltar de PostDetail após comentar)
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      fetchPosts();
+    });
+    return unsubscribe;
+  }, [navigation, searchTerm, currentUserId]);
+  
   const fetchPosts = async () => {
     setLoadingPosts(true);
     try {
@@ -66,27 +91,14 @@ useEffect(() => {
         params: searchTerm ? { q: searchTerm } : {},
         headers: { Authorization: `Bearer ${await AsyncStorage.getItem('userToken')}` }
       });
-
-      // Atualiza o estado de likes do usuário com base nos posts buscados
-      let initialUserLikes = {};
-      if (currentUserId) {
-        try {
-          const likesResponse = await axios.get(API_ENDPOINTS.USER_LIKES(currentUserId), {
-            headers: { Authorization: `Bearer ${await AsyncStorage.getItem('userToken')}` }
-          });
-          const likesArray = likesResponse.data.likes || [];
-
-          likesArray.forEach(like => {
-            initialUserLikes[like.post_id] = true;
-          });
-          
-        } catch (likesError) {
-          console.error('Erro ao buscar likes do usuário para inicialização:', likesError.response?.data || likesError.message);
-        }
-      }
-      setUserLikes(initialUserLikes);
-
-      setPosts(response.data);
+      
+      // Garantir que counts venham como números
+      const normalized = Array.isArray(response.data) ? response.data.map(p => ({
+        ...p,
+        comments_count: Number(p.comments_count || 0),
+        likes_count: Number(p.likes_count || 0)
+      })) : [];
+      setPosts(normalized);
     } catch (error) {
       console.error('Erro ao buscar posts:', error.response?.data || error.message);
       Alert.alert('Erro', 'Não foi possível carregar os posts.');
@@ -231,12 +243,40 @@ useEffect(() => {
     }
   };
 
-
+  // abre modal para confirmar exclusão
+  const openDeleteModal = (postId) => {
+    setPostToDelete(postId);
+    setDeleteModalVisible(true);
+  };
+  
+  const closeDeleteModal = () => {
+    setPostToDelete(null);
+    setDeleteModalVisible(false);
+  };
+  
+  const handleConfirmDelete = async () => {
+    if (!postToDelete) return;
+    setIsDeleting(true);
+    try {
+      const token = await AsyncStorage.getItem('userToken');
+      await axios.delete(API_ENDPOINTS.DELETE_POST(postToDelete), {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setPosts(prev => prev.filter(p => p.id !== postToDelete));
+      closeDeleteModal();
+    } catch (err) {
+      console.error('Erro ao excluir post:', err.response?.data || err.message);
+      Alert.alert('Erro', 'Não foi possível excluir o post.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+  
   const renderPostItem = ({ item }) => (
     <View style={styles.postCard}>
       <View style={styles.postHeader}>
         {item.profile_picture_url ? (
-        <Image source={{ uri: `${API_ENDPOINTS}/${item.profile_picture_url}` }} style={styles.profilePicture} />
+          <Image source={{ uri: getImageUri(item.profile_picture_url) }} style={styles.profilePicture} />
         ) : (
           <Ionicons name="person-circle" size={40} color="#ccc" style={styles.profilePicturePlaceholder} />
         )}
@@ -244,7 +284,7 @@ useEffect(() => {
       </View>
       <Text style={styles.postTitle}>{item.title}</Text>
       <Text style={styles.postContent}>{item.content}</Text>
-      {item.image_url && <Image source={{ uri: `${API_ENDPOINTS}/${item.image_url}` }} style={styles.postImage} />}
+      {item.image_url && <Image source={{ uri: getImageUri(item.image_url) }} style={styles.postImage} />}
       <View style={styles.postFooter}>
         <TouchableOpacity style={styles.interactionButton} onPress={() => handleToggleLike(item.id)}>
           <Ionicons
@@ -255,126 +295,156 @@ useEffect(() => {
           <Text style={styles.interactionText}>{item.likes_count}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.interactionButton} onPress={() => navigation.navigate('AppStack', { screen: 'PostDetail', params: {postId: item.id} })}>
+        <TouchableOpacity
+          style={styles.interactionButton}
+          onPress={() => navigation.navigate('AppStack', { screen: 'PostDetail', params: { postId: item.id } })}
+        >
           <Ionicons name="chatbubble-outline" size={24} color="#666" />
           <Text style={styles.interactionText}>{item.comments_count}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.interactionButton} onPress={() => handleToggleFavorite(item.id)}>
-          <Ionicons name="bookmark-outline" size={24} color="#666" />
-        </TouchableOpacity>
+        {user && item.user_id === user.id ? (
+          <TouchableOpacity style={styles.interactionButton} onPress={() => openDeleteModal(item.id)}>
+            <Ionicons name="trash-outline" size={24} color="#c62828" />
+          </TouchableOpacity>
+        ) : (
+          <View style={{ width: 36 }} />
+        )}
       </View>
     </View>
   );
+  
+  // Modal de confirmação de exclusão
+  // insira este bloco logo antes do retorno (return) principal da tela
+  return (
+    <View style={styles.container}>
+      {/* Delete confirmation modal */}
+      <Modal
+        visible={deleteModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeDeleteModal}
+      >
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <View style={{ width: '85%', backgroundColor: '#fff', borderRadius: 10, padding: 20 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 12 }}>Confirmar exclusão</Text>
+            <Text style={{ marginBottom: 20 }}>Deseja realmente excluir esta postagem?</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <TouchableOpacity onPress={closeDeleteModal} style={{ marginRight: 12 }}>
+                <Text style={{ color: '#555' }}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleConfirmDelete} disabled={isDeleting} style={{ backgroundColor: '#c62828', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6 }}>
+                {isDeleting ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff' }}>Excluir</Text>}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
+      {/* Header */}
+      <View style={styles.header}>
+      <DrawerMenu />
+        <View style={styles.headerButtons}>
+          <TouchableOpacity onPress={() => navigation.navigate('EditProfile')} style={styles.profileButton}>
 
-
-return (
-  <View style={styles.container}>
-    {/* Header */}
-    <View style={styles.header}>
-    <DrawerMenu />
-      <View style={styles.headerButtons}>
-        <TouchableOpacity onPress={() => navigation.navigate('EditProfile')} style={styles.profileButton}>
-
-          {user?.profile_picture_url ? (
-            <Image
-              source={{ uri: `${API_ENDPOINTS}/${user.profile_picture_url}` }}
-              style={styles.headerProfilePicture}
-            />
-          ) : (
-            <Ionicons name="person-circle-outline" size={30} color="#007bff" />
-          )}
-        </TouchableOpacity>
-        {user && <Text style={styles.username}>Olá, {user.username}</Text>}
-      </View>
-    </View>
-
-    {/* Barra de pesquisa */}
-    <View style={styles.searchContainer}>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Pesquisar posts por título ou conteúdo..."
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-        onSubmitEditing={fetchPosts}
-      />
-      <TouchableOpacity onPress={fetchPosts} style={styles.searchButton}>
-        <Ionicons name="search" size={24} color="#fff" />
-      </TouchableOpacity>
-    </View>
-
-    {/* Lista de posts */}
-    <View style={{ flex: 1 }}>
-      {loadingPosts ? (
-        <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 20 }} />
-      ) : (
-        <FlatList
-          data={posts}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={renderPostItem}
-          contentContainerStyle={styles.postList}
-          ListEmptyComponent={
-            <Text style={styles.noPostsText}>
-              Nenhum post encontrado. Tente ajustar sua pesquisa ou seja o primeiro a postar!
-            </Text>
-          }
-        />
-      )}
-    </View>
-
-    {/* Botão flutuante */}
-    <TouchableOpacity style={styles.fab} onPress={() => setModalVisible(true)}>
-      <Ionicons name="add" size={28} color="white" />
-    </TouchableOpacity>
-
-    {/* Modal de criar post */}
-    <Modal
-      visible={modalVisible}
-      animationType="slide"
-      transparent={true}
-      onRequestClose={() => setModalVisible(false)}
-    >
-      <View style={styles.modalBackground}>
-        <View style={styles.modalContent}>
-          <ScrollView>
-            <Text style={styles.modalTitle}>Criar Post</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Título"
-              value={newPostTitle}
-              onChangeText={setNewPostTitle}
-            />
-            <TextInput
-              style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
-              placeholder="Conteúdo"
-              value={newPostContent}
-              onChangeText={setNewPostContent}
-              multiline
-            />
-            <TouchableOpacity style={styles.imagePickerButton} onPress={pickPostImage}>
-              <Ionicons name="image-outline" size={24} color="#007bff" />
-              <Text style={styles.imagePickerButtonText}>Adicionar Imagem</Text>
-            </TouchableOpacity>
-            {newPostImageUri && <Image source={{ uri: newPostImageUri }} style={styles.previewImage} />}
-            <Button
-              title={isSubmitting ? "Publicando..." : "Publicar"}
-              onPress={handleCreatePost}
-              disabled={isSubmitting}
-            />
-            <Button title="Cancelar" color="red" onPress={() => setModalVisible(false)} />
-          </ScrollView>
+            {user?.profile_picture_url ? (
+              <Image
+                source={{ uri: getImageUri(user.profile_picture_url) }}
+                style={styles.headerProfilePicture}
+              />
+            ) : (
+              <Ionicons name="person-circle-outline" size={30} color="#007bff" />
+            )}
+          </TouchableOpacity>
+          {user && <Text style={styles.username}>Olá, {user.username}</Text>}
         </View>
       </View>
-    </Modal>
-  </View>
-);
+
+      {/* Barra de pesquisa */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Pesquisar posts por título ou conteúdo..."
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+          onSubmitEditing={fetchPosts}
+        />
+        <TouchableOpacity onPress={fetchPosts} style={styles.searchButton}>
+          <Ionicons name="search" size={24} color="#fff" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Lista de posts */}
+      <View style={{ flex: 1 }}>
+        {loadingPosts ? (
+          <ActivityIndicator size="large" color="#0000ff" style={{ marginTop: 20 }} />
+        ) : (
+          <FlatList
+            data={posts}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={renderPostItem}
+            contentContainerStyle={styles.postList}
+            ListEmptyComponent={
+              <Text style={styles.noPostsText}>
+                Nenhum post encontrado. Tente ajustar sua pesquisa ou seja o primeiro a postar!
+              </Text>
+            }
+          />
+        )}
+      </View>
+
+      
+      <TouchableOpacity style={styles.fab} onPress={() => setModalVisible(true)}>
+        <Ionicons name="add" size={28} color="white" />
+      </TouchableOpacity>
+
+
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContent}>
+            <ScrollView>
+              <Text style={styles.modalTitle}>Criar Post</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Título"
+                value={newPostTitle}
+                onChangeText={setNewPostTitle}
+              />
+              <TextInput
+                style={[styles.input, { height: 100, textAlignVertical: 'top' }]}
+                placeholder="Conteúdo"
+                value={newPostContent}
+                onChangeText={setNewPostContent}
+                multiline
+              />
+              <TouchableOpacity style={styles.imagePickerButton} onPress={pickPostImage}>
+                <Ionicons name="image-outline" size={24} color="#007bff" />
+                <Text style={styles.imagePickerButtonText}>Adicionar Imagem</Text>
+              </TouchableOpacity>
+              {newPostImageUri && <Image source={{ uri: newPostImageUri }} style={styles.previewImage} />}
+              <Button
+                title={isSubmitting ? "Publicando..." : "Publicar"}
+                onPress={handleCreatePost}
+                disabled={isSubmitting}
+              />
+              <Button title="Cancelar" color="red" onPress={() => setModalVisible(false)} />
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E1FAD8', // fundo suave
+    backgroundColor: '#E1FAD8', 
     paddingTop: 40,
   },
   header: {
@@ -385,7 +455,7 @@ const styles = StyleSheet.create({
     paddingBottom: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#9FD986',
-    backgroundColor: '#E1FAD8', // header verde médio
+    backgroundColor: '#E1FAD8', 
   },
   headerProfilePicture: {
     width: 35,

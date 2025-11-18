@@ -9,7 +9,7 @@ import DrawerMenu from "../components/DrawerMenu";
 
 
 const DietScreen = () => {
-  const { meals, addMeal, updateMeal, deleteMeal, addFoodToMeal } = useDiet();
+  const { meals, addMeal, updateMeal, deleteMeal, addFoodToMeal, updateFoodQuantity } = useDiet();
   const { user } = useContext(AuthContext);
 
   const [selectedMeal, setSelectedMeal] = useState(null);
@@ -18,7 +18,17 @@ const DietScreen = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [suggestions, setSuggestions] = useState([]);
 
-  // 🔍 Buscar sugestões de alimentos por nome
+  //quantidade de um alimento
+  const [editingFood, setEditingFood] = useState(null);
+  const [tempQuantity, setTempQuantity] = useState('');
+
+  
+  const apiBase = API_ENDPOINTS.GETUSER.replace('/user', '');
+  const profileImageUri = user?.profile_picture_url
+    ? (user.profile_picture_url.startsWith('http') ? user.profile_picture_url : `${apiBase}${user.profile_picture_url}`)
+    : 'https://via.placeholder.com/150';
+
+  // alimentos por nome
   useEffect(() => {
     const fetchSuggestions = async () => {
       if (searchTerm.trim().length < 2) {
@@ -47,16 +57,15 @@ const DietScreen = () => {
   };
 
   return (
-    
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={styles.screen} contentContainerStyle={styles.container}>
       <DrawerMenu />  
       {/* foto de perfil */}
       <View style={styles.profileContainer}>
         <Image
-          source={{ uri: user?.profilePicture || 'https://via.placeholder.com/150' }}
+          source={{ uri: profileImageUri }}
           style={styles.profileImage}
         />
-        <Text style={styles.profileName}>{user?.name || 'Usuário'}</Text>
+        <Text style={styles.profileName}>{user?.username || 'Usuário'}</Text>
       </View>
 
       {/* refeições */}
@@ -81,9 +90,51 @@ const DietScreen = () => {
           {/* alimentos da refeição */}
           {meal.foods.map((food, index) => (
             <View key={index} style={styles.foodItem}>
-              <Text style={styles.foodText}>{food.nome}</Text>
+              <View style={{flexDirection:'row', justifyContent:'space-between', alignItems:'center'}}>
+                <Text style={styles.foodText}>{food.nome} — {food.quantidade}g</Text>
+
+                {/* botão para abrir edição de quantidade */}
+                <TouchableOpacity
+                  style={styles.quantityButton}
+                  onPress={() => {
+                    setEditingFood({ mealId: meal.id, foodId: food.id });
+                    setTempQuantity(String(food.quantidade));
+                    setSelectedMeal(null);
+                  }}
+                >
+                  <Image source={require('../../assets/edit.png')} style={styles.quantityIcon} />
+                  <Text style={styles.quantityLabel}>Quant.</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* campo inline para editar quantidade do alimento */}
+              {editingFood && editingFood.mealId === meal.id && editingFood.foodId === food.id ? (
+                <View style={{flexDirection:'row', alignItems:'center', marginTop:8}}>
+                  <TextInput
+                    style={[styles.input, {flex:1}]}
+                    keyboardType="numeric"
+                    value={tempQuantity}
+                    onChangeText={setTempQuantity}
+                    placeholder="Quantidade (g)"
+                  />
+                  <TouchableOpacity style={[styles.saveButton, {marginLeft:8}]} onPress={() => {
+                    const q = Number(tempQuantity) || 0;
+                    if (q > 0) {
+                      updateFoodQuantity(meal.id, food.id, q);
+                    }
+                    setEditingFood(null);
+                    setTempQuantity('');
+                  }}>
+                    <Text style={styles.saveButtonText}>Salvar</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{marginLeft:8}} onPress={() => { setEditingFood(null); setTempQuantity(''); }}>
+                    <Text style={{color:'#888'}}>Cancelar</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : null}
+
               <Text style={styles.foodMacros}>
-                {food.calorias}kcal • P: {food.proteina}g • C: {food.carboidrato}g • G: {food.gordura}g
+                {Math.round(food.calorias*100)/100}kcal • P: {Math.round(food.proteina*100)/100}g • C: {Math.round(food.carboidrato*100)/100}g • G: {Math.round(food.gordura*100)/100}g
               </Text>
             </View>
           ))}
@@ -91,10 +142,10 @@ const DietScreen = () => {
           {/* totais da refeição */}
           <View style={styles.totalsBlock}>
             <Text style={styles.totalsTitle}>Total da refeição:</Text>
-            <Text style={styles.totalsLine}>Calorias: {meal.totals.calories} kcal</Text>
-            <Text style={styles.totalsLine}>Proteína: {meal.totals.protein} g</Text>
-            <Text style={styles.totalsLine}>Carboidrato: {meal.totals.carbs} g</Text>
-            <Text style={styles.totalsLine}>Gordura: {meal.totals.fat} g</Text>
+            <Text style={styles.totalsLine}>Calorias: {Math.round(meal.totals.calories*100)/100} kcal</Text>
+            <Text style={styles.totalsLine}>Proteína: {Math.round(meal.totals.protein*100)/100} g</Text>
+            <Text style={styles.totalsLine}>Carboidrato: {Math.round(meal.totals.carbs*100)/100} g</Text>
+            <Text style={styles.totalsLine}>Gordura: {Math.round(meal.totals.fat*100)/100} g</Text>
           </View>
 
           {/* cmpo de busca de alimentos */}
@@ -127,18 +178,23 @@ const DietScreen = () => {
 
           {/* ⚙️ Ações da refeição */}
           <View style={styles.mealActions}>
-            <TouchableOpacity onPress={() => setSelectedMeal(meal.id)}>
-              <Text style={styles.action}>➕ Alimentos</Text>
+            <TouchableOpacity style={styles.actionButton} onPress={() => setSelectedMeal(meal.id)}>
+              <Image source={require('../../assets/add.png')} style={styles.actionIcon} />
+              <Text style={styles.actionLabel}>Alimentos</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => {
+
+            <TouchableOpacity style={styles.actionButton} onPress={() => {
               setEditingMeal(meal.id);
               setNewMealName(meal.name);
               setSelectedMeal(null);
             }}>
-              <Text style={styles.action}>✏️ Editar</Text>
+              <Image source={require('../../assets/edit.png')} style={styles.actionIcon} />
+              <Text style={styles.actionLabel}>Editar</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => deleteMeal(meal.id)}>
-              <Text style={[styles.action, { color: 'red' }]}>🗑️ Excluir</Text>
+
+            <TouchableOpacity style={styles.actionButton} onPress={() => deleteMeal(meal.id)}>
+              <Image source={require('../../assets/delete.png')} style={styles.actionIcon} />
+              <Text style={[styles.actionLabel, styles.deleteLabel]}>Excluir</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -153,9 +209,36 @@ const DietScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  // garante que o ScrollView cubra toda a tela e mantenha a cor de fundo
+  screen: {
+    flex: 1,
+    backgroundColor: '#F5FFF0',
+  },
   container: {
     padding: 16,
-    backgroundColor: '#F5FFF0',
+  },
+  mealActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 12,
+  },
+  actionButton: {
+    alignItems: 'center',
+    width: '30%',
+  },
+  actionIcon: {
+    width: 20,
+    height: 20,
+    marginBottom: 6,
+  },
+  actionLabel: {
+    fontSize: 14,
+    color: '#1C3A13',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  deleteLabel: {
+    color: 'red',
   },
   profileContainer: {
     alignItems: 'center',
@@ -214,16 +297,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
   },
-  mealActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 12,
-  },
-  action: {
-    fontSize: 14,
-    color: '#1C3A13',
-    fontWeight: 'bold',
-  },
   editContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -270,6 +343,22 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  quantityButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 56,
+  },
+  quantityIcon: {
+    width: 14,
+    height: 14,
+    marginBottom: 4,
+    tintColor: '#1C3A13',
+  },
+  quantityLabel: {
+    fontSize: 12,
+    color: '#1C3A13',
+    textAlign: 'center',
   },
 });
 

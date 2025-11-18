@@ -64,10 +64,12 @@ const handleProfilePictureUpload = async (req, res) => {
       return res.status(400).json({ message: 'ID do usuário não informado.' });
     }
 
-    const imageUrl = `/uploads/profile_pictures/${req.file.filename}`;
+    const imagePath = `/uploads/profile_pictures/${req.file.filename}`; 
+    const fullUrl = `${req.protocol}://${req.get('host')}/api${imagePath}`; 
 
     const query = 'UPDATE User SET profile_picture_url = ? WHERE id = ?';
-    connection.query(query, [imageUrl, userId], (err) => {
+
+    connection.query(query, [fullUrl, userId], (err) => {
       if (err) {
         console.error('Erro ao salvar URL da foto de perfil no DB:', err);
         return res.status(500).json({ message: 'Erro ao atualizar a foto de perfil.' });
@@ -75,7 +77,7 @@ const handleProfilePictureUpload = async (req, res) => {
 
       res.status(200).json({
         message: 'Foto de perfil atualizada com sucesso!',
-        imageUrl
+        imageUrl: fullUrl 
       });
     });
   } catch (error) {

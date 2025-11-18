@@ -9,6 +9,7 @@ router.get('/meal/:id', FoodController.getUserMeals);
 router.get('/food/:id', FoodController.getMealFoods);
 router.post('/meal', FoodController.createMeal);
 router.post('/food', FoodController.createFood);
+router.put('/food/:id', FoodController.updateFoodQuantity); 
 router.delete('/meal/:id', FoodController.deleteMeal);
 
 

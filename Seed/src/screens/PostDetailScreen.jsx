@@ -1,28 +1,35 @@
 import React, { useState, useEffect, useContext } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TextInput,
-  Button, ActivityIndicator, Alert, Image, TouchableOpacity, FlatList
+  Button, ActivityIndicator, Alert, Image, TouchableOpacity, FlatList, Modal
 } from 'react-native';
 import axios from 'axios'
-import AuthContext from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { API_ENDPOINTS } from '../config/api';
 
 const PostDetailScreen = ({ route, navigation }) => {
   const { postId } = route.params;
-  const { signOut } = useContext(AuthContext);
+  const { signOut, user: authUser } = useContext(AuthContext); 
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [newCommentContent, setNewCommentContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
+ 
+  const apiBase = API_ENDPOINTS?.GETUSER ? API_ENDPOINTS.GETUSER.replace('/user', '') : API_ENDPOINTS?.BASE || '';
+  const getImageUri = (pathOrUrl) => {
+    if (!pathOrUrl) return null;
+    if (pathOrUrl.startsWith('http')) return pathOrUrl;
+    if (pathOrUrl.startsWith('/')) return `${apiBase}${pathOrUrl}`;
+    return `${apiBase}/${pathOrUrl}`;
+  };
 
   useEffect(() => {
     fetchPostAndComments();
-  }, [postId]); // Adicionado postId como dependência para recarregar se o post mudar (ex: navegação entre posts)
-
+  }, [postId]);
   const fetchPostAndComments = async () => {
     setLoading(true);
     try {
@@ -56,8 +63,9 @@ const PostDetailScreen = ({ route, navigation }) => {
         return;
       }
 
+
       await axios.post(
-        `/comments/${postId}`,
+        API_ENDPOINTS.COMMENTS_BY_POST_ID(postId),
         { content: newCommentContent },
         { headers: { Authorization: `Bearer ${userToken}` } }
       );
@@ -97,13 +105,13 @@ const PostDetailScreen = ({ route, navigation }) => {
     <View style={styles.commentCard}>
       <View style={styles.commentHeader}>
         {item.profile_picture_url ? (
-          <Image source={{ uri: `http://192.168.1.10:3001${item.profile_picture_url}` }} style={styles.commentProfilePicture} />
+          <Image source={{ uri: getImageUri(item.profile_picture_url) }} style={styles.commentProfilePicture} />
         ) : (
           <Ionicons name="person-circle" size={30} color="#ccc" style={styles.commentProfilePicturePlaceholder} />
         )}
         <Text style={styles.commentUsername}>{item.username}</Text>
         <Text style={styles.commentTimestamp}>
-          {new Date(item.created_at).toLocaleString('pt-BR')}
+          {item.created_at ? new Date(item.created_at).toLocaleString('pt-BR') : ''}
         </Text>
       </View>
       <Text style={styles.commentContent}>{item.content}</Text>
@@ -117,15 +125,19 @@ const PostDetailScreen = ({ route, navigation }) => {
           <Ionicons name="arrow-back" size={28} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Detalhes do Post</Text>
-        <View style={{ width: 28 }} />
+        {/* foto do usuario */}
+        <View style={{ width: 36 }}>
+          {authUser?.profile_picture_url ? (
+            <Image source={{ uri: getImageUri(authUser.profile_picture_url) }} style={{ width: 28, height: 28, borderRadius: 14 }} />
+          ) : null}
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        {/* Detalhes do Post */}
-        <View style={styles.postDetailCard}>
+        {/* Detalhes do Post */}        <View style={styles.postDetailCard}>
           <View style={styles.postHeader}>
             {post.profile_picture_url ? (
-              <Image source={{ uri: `http://192.168.1.10:3001${post.profile_picture_url}` }} style={styles.profilePicture} />
+              <Image source={{ uri: getImageUri(post.profile_picture_url) }} style={styles.profilePicture} />
             ) : (
               <Ionicons name="person-circle" size={40} color="#ccc" style={styles.profilePicturePlaceholder} />
             )}
@@ -133,14 +145,14 @@ const PostDetailScreen = ({ route, navigation }) => {
           </View>
           <Text style={styles.postTitle}>{post.title}</Text>
           <Text style={styles.postContent}>{post.content}</Text>
-          {post.image_url && <Image source={{ uri: `http://192.168.1.10:3001${post.image_url}` }} style={styles.postImage} />}
+          {post.image_url && <Image source={{ uri: getImageUri(post.image_url) }} style={styles.postImage} />}
           <View style={styles.postStatsContainer}>
             <Text style={styles.postStats}>{post.likes_count} Curtidas</Text>
             <Text style={styles.postStats}>{post.comments_count} Comentários</Text>
           </View>
         </View>
 
-        {/* Seção de Comentários */}
+ 
         <Text style={styles.commentsTitle}>Comentários</Text>
         <FlatList
           data={comments}
@@ -150,7 +162,7 @@ const PostDetailScreen = ({ route, navigation }) => {
           ListEmptyComponent={<Text style={styles.noCommentsText}>Nenhum comentário ainda. Seja o primeiro!</Text>}
         />
 
-        {/* Campo para Adicionar Comentário */}
+
         <View style={styles.addCommentContainer}>
           <TextInput
             style={styles.commentInput}
@@ -190,7 +202,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
-    paddingTop: 40, // Para iOS SafeArea
+    paddingTop: 40, 
   },
   backButton: {
     padding: 5,

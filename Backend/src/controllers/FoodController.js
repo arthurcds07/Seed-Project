@@ -227,6 +227,38 @@ const deleteMeal = (req, res) => {
   });
 };
 
+const updateFoodQuantity = (req, res) => {
+  const { id } = req.params; 
+  const { quantidade } = req.body;
+
+  if (quantidade == null || isNaN(Number(quantidade)) || Number(quantidade) <= 0) {
+    return res.status(400).json({ success: false, message: "Quantidade inválida" });
+  }
+
+  const query = 'UPDATE AlimentosRefeicoes SET quantidade = ? WHERE id = ?';
+
+  connection.query(query, [Number(quantidade), id], (err, result) => {
+    if (err) {
+      console.error('Erro ao atualizar quantidade:', err);
+      return res.status(500).json({
+        success: false,
+        message: "Erro no servidor"
+      });
+    }
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Registro de alimento na refeição não encontrado"
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Quantidade atualizada com sucesso"
+    });
+  });
+};
 
 module.exports = {
   getAllFoods,
@@ -236,5 +268,6 @@ module.exports = {
   createMeal,
   createFood,
   getFoodById,
-  deleteMeal
+  deleteMeal,
+  updateFoodQuantity
 };

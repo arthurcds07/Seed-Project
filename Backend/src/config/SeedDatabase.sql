@@ -81,7 +81,17 @@ INSERT INTO alimentos (nome, categoria, calorias, proteina, carboidrato, gordura
 ('Castanha-do-pará', 'Oleaginosas', 656.0, 14.3, 12.3, 66.4, 7.9),
 ('Nozes', 'Oleaginosas', 654.0, 15.2, 13.7, 65.2, 6.7),
 ('Amendoim', 'Oleaginosas', 567.0, 25.8, 16.1, 49.2, 8.5),
-('Tahine', 'Pasta de sementes', 595.0, 17.0, 21.2, 53.8, 9.3);
+('Tahine', 'Pasta de sementes', 595.0, 17.0, 21.2, 53.8, 9.3),
+('Pão francês', 'Cereais', 286.0, 8.0, 56.0, 3.5, 2.3),
+('Torrada integral', 'Cereais', 420.0, 14.0, 68.0, 10.0, 7.0),
+('Melancia', 'Frutas', 30.0, 0.6, 7.6, 0.2, 0.4),
+('Abacaxi', 'Frutas', 50.0, 0.5, 13.0, 0.1, 1.4),
+('Maracujá', 'Frutas', 68.0, 2.0, 14.8, 0.7, 10.4),
+('Caju', 'Frutas', 43.0, 0.9, 10.2, 0.3, 1.7),
+('Goiaba branca', 'Frutas', 68.0, 2.6, 14.3, 1.0, 5.4),
+('Suco de laranja natural', 'Sucos', 45.0, 0.7, 10.4, 0.2, 0.2),
+('Suco de uva integral', 'Sucos', 60.0, 0.4, 15.5, 0.1, 0.4),
+('Suco de abacaxi natural', 'Sucos', 53.0, 0.5, 13.0, 0.1, 0.2);
 
 
 CREATE TABLE posts (

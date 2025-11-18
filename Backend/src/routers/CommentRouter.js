@@ -2,13 +2,13 @@
 
 const express = require('express');
 const router = express.Router();
-const commentController = require('../controllers/CommentController');
-const authMiddleware = require('../middlewares/authMiddleware');
+const CommentController = require('../controllers/CommentController');
+const { verifyToken } = require('../middlewares/authMiddleware');
 
-// Obter comentários de um post (pode ser público)
-router.get('/:postId', commentController.getCommentsByPostId);
+// Buscar comentários de um post
+router.get('/:postId', CommentController.getCommentsByPostId);
 
-// Adicionar um comentário (requer autenticação)
-router.post('/:postId', authMiddleware.verifyToken, commentController.createComment);
+// Criar comentário (protegido)
+router.post('/:postId', verifyToken, CommentController.createComment);
 
 module.exports = router;
